@@ -1,8 +1,10 @@
 import fetch from 'node-fetch'; 
 
-const token = 'JWT eyJhbGciOiJSUzI1NiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE2Njk2OTkyNDksIm93bmVyIjoic2FsZW9yIiwiaXNzIjoiaHR0cHM6Ly9hdmUuc2FsZW9yLmNsb3VkL2dyYXBocWwvIiwiZXhwIjoxNjY5Njk5NTQ5LCJ0b2tlbiI6IjdpZHRwWm5MTVk2MiIsImVtYWlsIjoiZGF2aWRmYTk3MThAZ21haWwuY29tIiwidHlwZSI6ImFjY2VzcyIsInVzZXJfaWQiOiJWWE5sY2pveCIsImlzX3N0YWZmIjp0cnVlfQ.JvD9tCv13EI1RbB2J4CSexOSCGb7FPvwZkFiOvQ5BG_9bGj5SsLzG7moUnQkIurjSYyF6hVybu_yEbU9NsPPZ72Ser-eEE9C3DucV_4-jt0mRPADfpYiW4ZeGrXaGkHo61zwP-vq9eQe6qgOK0bb4tgW-ETgYQ1drReQSDbZNTmG9_-qVjjHKkJQV4DAya1_nyx_hobfqQbP8bEl5sS6S5WjH1ZXWYxo2uSzdjLYIpQeLfTD3BhK6kY5LtoCjDTR8TuqK62qPmYWyN46ynELuVjazjPqgb4xHbFEtRqwVd3Po6q5QBHTRUww-g06uQnA_29mLFiTE1JzrVmL6jhQJg';
+const token = 'JWT eyJhbGciOiJSUzI1NiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE2NzA2NTM3OTcsIm93bmVyIjoic2FsZW9yIiwiaXNzIjoiaHR0cHM6Ly9hdmUuc2FsZW9yLmNsb3VkL2dyYXBocWwvIiwiZXhwIjoxNjcwNjU0MDk3LCJ0b2tlbiI6IjdpZHRwWm5MTVk2MiIsImVtYWlsIjoiZGF2aWRmYTk3MThAZ21haWwuY29tIiwidHlwZSI6ImFjY2VzcyIsInVzZXJfaWQiOiJWWE5sY2pveCIsImlzX3N0YWZmIjp0cnVlfQ.WGeZ9qzoWAUkEFg4XOcecwW-wW23zoabfh9y-SB56Jzo607ZDuhzoaGcIjs0m5pjnct8Bcau_A0R-0GT1dbweWnBVM3LP3jYBUQ1_Mj0ZJoIgXTeDtjIC7FW3NGyBemFijftwIQ1THKe_TYvvSY3pZcnCOYY4NpOHzW1as2I1xhrGuOTINJyFNKUsygMyfWRfoT_kgrA7-D425i4lRFWPDGS3SjrN6qjB6JqtbmcUYd-4BQ14zvT2bFGIeOFRl18O-7z5iTGBkPt8MKBj6lGjqWI5AOJRoP0R1Lvu3pEmc0hL7gd0nYRwVtnS44GOiFaIhsvwgpG7qgkvYJWAeCYMQ';
 
 async function mutationProduct(){
+    let name = "Prueba desde consola 8";
+    let description = `{"time": 1670651475205, "blocks": [{"id": "VoMHpf3HsZ", "data": {"text": "Prueba de producto promocionales descripci\u00f3n"}, "type": "paragraph"}], "version": "2.24.3"}`;
     try{
         const resql = await fetch('https://ave.saleor.cloud/graphql/', {
         method: 'POST',
@@ -14,13 +16,11 @@ async function mutationProduct(){
             mutation { 
                 productCreate(
                     input: {
-                        category: "Q2F0ZWdvcnk6MQ=="
-                        name: "Prueba desde consola"
-                        productType: "UHJvZHVjdFR5cGU6Mg=="
-                        chargeTaxes: true
-                        weight: "0.3"
+                        category: "Q2F0ZWdvcnk6Mg=="
+                        name: "${name}"
+                        productType: "UHJvZHVjdFR5cGU6NA=="
                         rating: 5
-                        #description:"{\"time\": 1666983096870, \"blocks\": [{\"id\": \"VunQv1uh5W\", \"data\": {\"text\": \"Producto compuesto por saleor\"}, \"type\": \"paragraph\"}], \"version\": \"2.24.3\"}"
+                        description: ${JSON.stringify(description)}
                     }
                 ) {
                     product {

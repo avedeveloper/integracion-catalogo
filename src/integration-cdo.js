@@ -1,40 +1,40 @@
 import fetch from 'node-fetch'; 
 
+const token = "Ukq3UBwcqaKmf9ZGmTkcTg";
+
 async function loadApiThree(){
     try{
         // Prueba categoria 9 boligrafos
-        const res = await fetch(`https://api.cataprom.com/rest/categorias/112/productos`)
+        const res = await fetch(`http://api.colombia.cdopromocionales.com/v1/products?auth_token=${token}`)
         const data = await res.json()
 
         let end = 5;
 
-        for (let i = 0; i < end; i++) {
+        for (let i = 1; i < end; i++) {
 
-            // ID de producto
-            const id = data.resultado[i].id;
+            // ID PRODUCT
+            let code = data[i].code;
             // Nombre de producto
-            let nombre = data.resultado[i].nombre;
+            let nombre = data[i].name;
             // Descripción de producto
-            let descripcionProducto = data.resultado[i].descripcionProducto;
-            let descriptionSanitaze = descripcionProducto.replace(/(\r\n|\n|\r)/gm, "");
+            let description = data[i].description;
+            let descriptionSanitaze = description.replace(/(\r\n|\n|\r)/gm, "");
             let descripcionmutation = `{"blocks": [{"id": "", "data": {"text": "${descriptionSanitaze}"}, "type": "paragraph"}], "version": ""}`;
-            // SKU
-            let sku = data.resultado[i].referencia;
-            // Imagen de producto
-            let img = data.resultado[i].imageUrl;
-            let urlimg = `https://www.catalogospromocionales.com${img}`;
-            // Precio del producto 1
-            let precio = data.resultado[i].precio1;
-            let imgfinal = urlimg.replace(/(\r\n|\n|\r)/gm, "");
-            let referencia = data.resultado[i].referencia;
 
-            /*console.log(referencia);
 
-            const resreferencia = await fetch(`https://api.cataprom.com/rest/stock/${referencia}`)
-            const datareferencia = await resreferencia.json()*/
+            let category = data[i].category;
+            let arrayVariants = data[i].variants;
 
-            //console.log(datareferencia);
-            
+            arrayVariants.forEach(variant => {
+                let colorVariant = variant.color;
+                let novedadVariant = variant.novedad;
+                let stockAvailableVariant = variant.stock_available;
+                let stockExistentVariant = variant.stock_existent;
+                let listPriceVariant = variant.list_price;
+                let listNetVariant = variant.net_price;
+                let pictureVariant = variant.detail_picture.medium;
+            });
+
             async function mutationToken(){
                 const email = "davidfa9718@gmail.com";
                 const password = "Saleor123+";
@@ -70,7 +70,7 @@ async function loadApiThree(){
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
-                            "Authorization": `Bearer ${tokenAuthorization}`
+                            "Authorization": `JWT ${tokenAuthorization}`
                         },
                         body: JSON.stringify({ query: `
                             mutation { 
@@ -105,7 +105,7 @@ async function loadApiThree(){
                                 productMediaCreate(
                                     input:{
                                         product: "${idProduct}",
-                                        mediaUrl: "https://d2jygl58194cng.cloudfront.net/product_images/pictures/000/073/998/original/promocional_publicitario_boligrafo_blanco_BP217.jpg"
+                                        mediaUrl: "https://d2jygl58194cng.cloudfront.net/product_images/pictures/000/070/323/original/boligrafo_negro_BP187_estuche_%281%29.jpg"
                                     }
                                 ){
                                     product {

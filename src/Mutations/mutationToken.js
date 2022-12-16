@@ -28,7 +28,7 @@ async function mutationToken(){
         ` }),
         })
         const dataql = await resql.json();
-        console.log(dataql);
+        console.log(dataql.data.tokenCreate.token);
 
     } catch (error) {
         console.log(error)

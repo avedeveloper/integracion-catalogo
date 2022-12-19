@@ -1,41 +1,18 @@
-import knex from "knex";
+import mongoose from "mongoose";
 import colors from "colors";
 import dotenv from "dotenv";
 
-export default async function connection_db_ave(connection, client) {
-try{
-  // CONFIG KNEKX
-  console.log("----------- CONFIG KNEKX".white);
-  return knex({
-    client,
-    connection,
-    pool: { min: 0, max: 7 },
-    log: {
-      warn(message) {
-        console.log("----------- WARNING DB --------------".yellow);
-        console.log(message.yellow)
-      },
-      error(message) {
-        console.log("----------- ERROR DB --------------".red);
-        console.log(message.yellow)
+export default async function connection_db_ave(connection) {
+  // CONFIG mongoose
+  mongoose.set('strictQuery', true);
+ await mongoose.connect(connection,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }).then( () => {console.log("----------- SUCCESS DB CONNECTION".green);})
+  .catch( (err) => {
+    console.log("----------- ERROR --------------".red);
+    console.log(err);process.exit(1);
+  });
 
-      },
-      deprecate(message) {
-        console.log("----------- DEPRECATE DB --------------".red);
-        console.log(message.yellow)
 
-      },
-      debug(message) {
-        console.log("----------- DEBUG DB --------------".blue);
-        console.log(message.yellow)
-
-      }
-    }
-
-  })
-}catch(err){
-  console.log(err);
-  return {};
-
-}
 };

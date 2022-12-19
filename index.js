@@ -4,7 +4,6 @@ import http from "http";
 import cors from "cors";
 import bodyParser from "body-parser";
 import express_session from "express-session";
-import knex from "knex";
 import colors from "colors";
 import api from "./src/routes/api.js";
 import connection_db_ave from "./src/db/db_ave.js";
@@ -12,6 +11,7 @@ import notfound from './src/middlewares/notfound.js';
 import login from './src/routes/admin/login.js';
 import handlerError from './src/middlewares/handlerErrors.js';
 import auth from "./src/middlewares/auth.js";
+
 // CONFIG DOTENV
 var config = dotenv.config();
 global.config = config.parsed;
@@ -22,12 +22,10 @@ console.log("----------- CHECK ENV".white);
 var required_env_variables = [
   "service_port",
   "environment",
-  "db_host",
-  "db_port",
-  "db_user",
-  "db_password",
-  "db_database",
-  "db_type"
+  "db_mongo_user",
+  "db_mongo_pass",
+  "SALT_ROUNDS",
+  "SECRET"
 ];
 var err = false;
 required_env_variables.map((e) => {
@@ -72,15 +70,11 @@ app.use(express_session({
   saveUninitialized: true,
 }));
 
-const config_db = {
-  host: process.env.db_host,
-  port: process.env.db_port,
-  user: process.env.db_user,
-  password: process.env.db_password,
-  database: process.env.db_database
-}
+
 console.log("----------- CONFIG DB".white);
-global.db = await connection_db_ave(config_db,process.env.db_type);
+var config_db = `mongodb+srv://${process.env.db_mongo_user}:${process.env.db_mongo_pass}@cluster0.lpr1s.mongodb.net/?retryWrites=true&w=majority`;
+
+global.db = await connection_db_ave(config_db);
 console.log("----------- SUCCESS DB CONNECTION".green);
 
 // CONFIG ROUTES

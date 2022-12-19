@@ -20,7 +20,7 @@ console.log("----------- AVE BACKEND ---------------".magenta);
 // VERIFICATION ENV
 console.log("----------- CHECK ENV".white);
 var required_env_variables = [
-  "service_port",
+  "PORT",
   "environment",
   "db_mongo_user",
   "db_mongo_pass",
@@ -94,6 +94,6 @@ app.use(notfound);
 
 console.log("----------- SUCCESS ROUTES".green);
 console.log("----------- SUCCESS SERVER".green);
-console.log("----------- SERVER RUN ON PORT:".green,process.env.service_port.rainbow);
-server.listen(process.env.service_port);
+console.log("----------- SERVER RUN ON PORT:".green,process.env.PORT.rainbow);
+server.listen(process.env.PORT);
 console.log("---------------------------------------".green);

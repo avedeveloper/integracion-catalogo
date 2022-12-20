@@ -13,6 +13,4 @@ export default async function connection_db_ave(connection) {
     console.log("----------- ERROR --------------".red);
     console.log(err);process.exit(1);
   });
-
-
 };

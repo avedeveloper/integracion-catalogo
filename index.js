@@ -11,6 +11,7 @@ import notfound from './src/middlewares/notfound.js';
 import login from './src/routes/admin/login.js';
 import handlerError from './src/middlewares/handlerErrors.js';
 import auth from "./src/middlewares/auth.js";
+import roles from "./src/routes/admin/roles.js";
 
 // CONFIG DOTENV
 var config = dotenv.config();
@@ -72,7 +73,7 @@ app.use(express_session({
 
 
 console.log("----------- CONFIG DB".white);
-var config_db = `mongodb+srv://${process.env.db_mongo_user}:${process.env.db_mongo_pass}@cluster0.lpr1s.mongodb.net/?retryWrites=true&w=majority`;
+var config_db = `mongodb+srv://${process.env.db_mongo_user}:${process.env.db_mongo_pass}@cluster0.lpr1s.mongodb.net/admin_users?retryWrites=true&w=majority`;
 
 global.db = await connection_db_ave(config_db);
 console.log("----------- SUCCESS DB CONNECTION".green);
@@ -82,9 +83,7 @@ console.log("----------- CONFIG ROUTES".white);
 app.use("/admin",login);
 app.use(auth)
 app.use("/api", api);
-app.use("/", (req, res) => {
-  res.send({data:req.user});
-});
+app.use("/admin/role", roles);
 
 app.use(handlerError)
 app.use(notfound);

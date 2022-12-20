@@ -22,8 +22,8 @@ router.post("/login", async (req, res,next) => {
       const passwordIsValid = bcrypt.compareSync(password, db_res.password);
       
       if (!passwordIsValid) throw new Error('Email or password is wrong');
-   
-      const token = jwt.sign({ id: db_res._id }, process.env.SECRET, { expiresIn: 86400 });
+      console.log(db_res)
+      const token = jwt.sign({ id: db_res._id,role:db_res.role }, process.env.SECRET, { expiresIn: 86400 });
       res.status(200).send({ token });
     } catch (err) {
       console.log(err);
@@ -31,21 +31,6 @@ router.post("/login", async (req, res,next) => {
     }
 });
 
-// router.post("/register", async (req, res,next) => {
-//   try{
-//     const salt = parseInt(process.env.SALT_ROUNDS);
-//     const user = new Users({
-//       email: 'pepe@pepe.com',
-//       password: bcrypt.hashSync('pepe', salt),
-//       name: 'adminDeveloper',
-//       role: 'admin',
-//     });
-//     await user.save();
-//     res.status(200).send({menssage:'User created',data:user});
 
-//   }catch(err){
-//     next(err);
-//   }
-// })
 
 export default router;

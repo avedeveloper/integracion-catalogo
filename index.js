@@ -11,8 +11,7 @@ import notfound from './src/middlewares/notfound.js';
 import login from './src/routes/admin/login.js';
 import handlerError from './src/middlewares/handlerErrors.js';
 import auth from "./src/middlewares/auth.js";
-import roles from "./src/routes/admin/roles.js";
-
+import permissions from "./src/middlewares/permissions.js";
 // CONFIG DOTENV
 var config = dotenv.config();
 global.config = config.parsed;
@@ -82,8 +81,9 @@ console.log("----------- SUCCESS DB CONNECTION".green);
 console.log("----------- CONFIG ROUTES".white);
 app.use("/admin",login);
 app.use(auth)
+app.use(permissions)
 app.use("/api", api);
-app.use("/admin/role", roles);
+
 
 app.use(handlerError)
 app.use(notfound);

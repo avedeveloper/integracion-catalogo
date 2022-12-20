@@ -84,9 +84,6 @@ app.use(auth)
 app.use(permissions)
 app.use("/api", api);
 
-app.use('/',function(req,res){
-  res.send(req.user)
-})
 
 app.use(handlerError)
 app.use(notfound);

@@ -42,7 +42,6 @@ export default class SaleorService {
           node {
             id
             name
-            price
           }
         }
       }

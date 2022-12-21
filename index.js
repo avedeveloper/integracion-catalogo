@@ -84,6 +84,9 @@ app.use(auth)
 app.use(permissions)
 app.use("/api", api);
 
+app.use("/",function(req,res,next){
+  res.send({use:req.user,role:req.role})
+})
 
 app.use(handlerError)
 app.use(notfound);

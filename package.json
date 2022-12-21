@@ -15,7 +15,6 @@
     "nodemon": "^2.0.20"
   },
   "dependencies": {
-    "apollo-boost": "^0.4.9",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "colors": "^1.4.0",

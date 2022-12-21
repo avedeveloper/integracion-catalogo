@@ -42,6 +42,34 @@ export default class SaleorService {
           node {
             id
             name
+            pricing(address:{
+              
+            }){
+              priceRange{
+                stop{
+                  net{
+                    currency
+                  }
+                  tax{
+                    currency
+                  }
+                  gross{
+                    currency
+                    amount
+                  }
+                }
+                start{
+                  net{
+                    currency
+                    amount
+                  }
+                  tax{
+                    currency
+                    amount
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -10,12 +10,12 @@ router.use(function timeLog(req, res, next) {
 );
 
 
-router.post('/products',async function(req, res,next) {
+router.post('/products',async function(req,res,next) {
   try{
   const saleorService = new SaleorService();
   const token = await saleorService.getToken();
   const products = await saleorService.getProducts();
-  res.send({products,token, desc:JSON.stringify(`{"time": 1670651475205, "blocks": [{"id": "VoMHpf3HsZ", "data": {"text": "Prueba de producto promocionales descripci\u00f3n"}`)});
+  res.send({token,products});
 
   }catch(err){
   console.log(err);

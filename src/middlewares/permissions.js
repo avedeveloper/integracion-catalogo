@@ -1,24 +1,58 @@
-import mongoose from "mongoose";
-import Roles from "../model/Roles.js";
+import User from "../model/Users";
+import Role from "../model/Roles";
 
 
-export default function permissions(req, res, next) {
-  const { role } = req.user;
-  try{
-    if(role == null)next("Role not found.");
-
-    Roles.findOne({
-      name: role
-    }, 
-    (err, role) => {
-      if (err)next(err);
-  
-      if (!role)next("Role not found.");
-      req.role = {name:role.name,permissions:role.permissions.split(",")};
-      if(req.role.permissions.length < 1)next("Permissions denied.");
-      next();
-    })
-  }catch(err){
-    next(err);
+const isMoterator = async (req, res, next) => {
+  if (req.user.role.includes("moderator", "admin")) {
+    const user = await User.findById(req.user.id);
+    const role = await Role.find({ name:{ $in: user.roles }});
+    for (let i = 0; i < role.length; i++) {
+      if (role[i].name === "moderator" || role[i].name === "admin") {
+        next()
+      };
+    };
+    next("You are not a moderator");
+  } else {
+    next("You are not a moderator");
   }
 }
+
+const isAdmin = async (req, res, next) => {
+  if (req.user.role.includes("admin")) {
+    const user = await User.findById(req.user.id);
+    const role = await Role.find({ name: { $in: user.roles } });
+
+    for (let i = 0; i < role.length; i++) {
+      if (role[i].name === "admin") {
+        next();
+      }
+    }
+    next("You are not an admin");
+  } else {
+    next("You are not an admin");
+  }
+};
+
+const isUser = async (req, res, next) => {
+  if (req.user.role.includes("user", "moderator", "admin")) {
+    const user = await User.findById(req.user.id);
+    const role = await Role.find({ name: { $in: user.roles } });
+    for (let i = 0; i < role.length; i++) {
+      if (role[i].name === "user" || role[i].name === "moderator" || role[i].name === "admin") {
+        next();
+      }
+    }
+    next("You are not a user");
+  } else {
+    next("You are not a user");
+  }
+}
+
+const isGuest = (req, res, next) => {
+  if (req.user.role.includes("user", "moderator", "admin", "guest")) {
+    next();
+  } else {
+    next("You are not a guest");
+  }
+}
+export { isMoterator, isAdmin, isUser, isGuest };

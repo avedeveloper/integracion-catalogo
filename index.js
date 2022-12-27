@@ -11,7 +11,8 @@ import notfound from './src/middlewares/notfound.js';
 import login from './src/routes/admin/login.js';
 import handlerError from './src/middlewares/handlerErrors.js';
 import auth from "./src/middlewares/auth.js";
-import permissions from "./src/middlewares/permissions.js";
+import products from "./src/routes/api/products/index.js";
+import { createRoles } from "./src/libs/initialSetups.js";
 // CONFIG DOTENV
 var config = dotenv.config();
 global.config = config.parsed;
@@ -43,6 +44,7 @@ console.log("----------- SUCCESS ENV".green);
 
 // CONFIG EXPRESS
 const app = express();
+createRoles();
 const server = http.Server(app);
 if(process.env.environment == "development"){
   console.log("----------- DEVELOPE MODE -------------".blue);
@@ -76,16 +78,18 @@ var config_db = `mongodb+srv://${process.env.db_mongo_user}:${process.env.db_mon
 
 global.db = await connection_db_ave(config_db);
 console.log("----------- SUCCESS DB CONNECTION".green);
-
+//Initial set up
 // CONFIG ROUTES
 console.log("----------- CONFIG ROUTES".white);
 app.use("/admin",login);
+
+
+
 app.use(auth)
-app.use(permissions)
-app.use("/api", api);
+app.use("/api/products", products);
 
 app.use("/",function(req,res,next){
-  res.send({use:req.user,role:req.role})
+  res.send({use:req.user})
 })
 
 app.use(handlerError)

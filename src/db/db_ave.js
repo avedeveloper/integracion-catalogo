@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 export default async function connection_db_ave(connection) {
   // CONFIG mongoose
   mongoose.set('strictQuery', true);
- await mongoose.connect(connection,{
+await mongoose.connect(connection,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
   }).then( () => {console.log("----------- SUCCESS DB CONNECTION".green);})
@@ -13,4 +13,5 @@ export default async function connection_db_ave(connection) {
     console.log("----------- ERROR --------------".red);
     console.log(err);process.exit(1);
   });
+
 };

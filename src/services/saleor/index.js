@@ -4,7 +4,7 @@ export default class SaleorService {
     this.client = {
       link: axios.create({
         baseURL: 'https://ave.saleor.cloud/graphql/',
-        headers:{
+        headers: {
           'Content-Type': 'application/json',
         },
       }),
@@ -34,41 +34,43 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts() {
+  async getProducts(channel, size) {
     const query = `
     query{
-      products(first: 10) {
+      products(
+        first: ${size || 10}
+        channel: "${channel}"
+      ) {
         edges {
           node {
             id
             name
-            pricing(address:{
-              
-            }){
-              priceRange{
-                stop{
-                  net{
-                    currency
-                  }
-                  tax{
-                    currency
-                  }
-                  gross{
-                    currency
+            pricing {
+              priceRange {
+                start {
+                  gross {
                     amount
-                  }
-                }
-                start{
-                  net{
                     currency
-                    amount
-                  }
-                  tax{
-                    currency
-                    amount
                   }
                 }
               }
+              discount {
+                gross {
+                  amount
+                  currency
+                }
+              }
+              priceRangeUndiscounted {
+                start {
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+            thumbnail {
+              url
             }
           }
         }
@@ -76,7 +78,7 @@ export default class SaleorService {
     }
     `;
     /*agregarle un header al axios */
-    const response = await this.client.link.post('',{ query });
+    const response = await this.client.link.post('', { query });
     const { data } = response;
     return data;
   }
@@ -96,6 +98,17 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
+  async isAvailableProductsByAddress(product) {
+    const query = `
+    query{
+      product(id: "${product.id}", channel: "${product.channel}") {
+        name
+        isAvailable(address: { country: ${product.country} })
+      }
+    }
+    `
+  }
+
   async getCategories() {
     const query = `
     query{
@@ -206,11 +219,9 @@ export default class SaleorService {
       productCreate(
                 input: {
                       category: "${product.category}"
-                      collections: "${product.collections}"
+                      collections: [${product.collection.map(e=>{return `"${e}"`})}]
                       name: "${product.name}"
-                      rating: ${product.rating}
-                      metadata: ${product.metadata}
-                      privateMetadata: ${product.privateMetadata}
+                      rating: ${product.raiting}
                       productType: "${product.productType}"
                 }) 
       {
@@ -224,9 +235,14 @@ export default class SaleorService {
         }
 }
     `;
-    const response = await this.client.link.post('', { query });
-    const { data } = response;
-    return data;
+    try {
+      const response = await this.client.link.post('', { query });
+      const { data } = response;
+      return data;
+    } catch (e) {
+      console.log(e)
+      return e;
+    }
   }
   async setCategory(category) {
     const query = `
@@ -271,7 +287,7 @@ export default class SaleorService {
   async setImageProduct(image) {
     const query = `
     productMediaCreate(input:{
-      product:"${image.product}"
+      product:"${image.id}"
       mediaUrl:"${image.mediaUrl}"
     }){
   errors{
@@ -324,46 +340,58 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
-  async setVariantProduct(variant) {
+  async setVariantProduct(variant,id) {
     const query = `
-    mutation { 
-      productVariantCreate(
-                input: {
-                      product: "${variant.product}"
-                      sku: "${variant.sku}"
-                      stocks: ${variant.stocks}
-                      trackInventory: ${variant.trackInventory}
-                      weight: ${variant.weight}
-                      metadata: ${variant.metadata}
-                      privateMetadata: ${variant.privateMetadata}
-
-                }) 
-      {
-        productVariant {
-            id
-          }
-        errors{
-          field
-          message
-        }
-      }`
+    mutation {
+      productVariantCreate(input:{
+        product:"${id}"
+        name:"${variant.name}"
+        sku:"${variant.sku}"
+        attributes:[${variant.attributes.map(e=>`{id:"${e.id}" plainText:"${e.plainText}"}`)}]
+        stocks:[${variant.stocks.map(e=>`{warehouse:"${e.warehouse}" quantity:${e.quantity}}`)}]
+      }){
+      productVariant{
+        id
+        name
+      }
+      errors{
+        field
+        message
+      }
+    }
+  }`
     const response = await this.client.link.post('', { query });
     const { data } = response;
-    }
-    async setPriceProduct(product) {
-    const query = `{
-      productVariant(id: "${product.id}", channel: "${product.channel}") {
-        pricing(address: { country: ${product.country}) {
-          price {
-            net {
-              ${product.amount}
+    return data;
+  }
+
+  async getProductsVariants(channel, size) {
+    const query = `
+    query{
+      productVariants(first: ${size} channel:"${channel}"){
+        edges{
+          node{
+            id
+            name
+            sku
+            pricing{
+              price{
+                currency
+                gross{
+                  currency
+                  amount
+                }
+                net{
+                  currency
+                  amount
+                }
+                tax{
+                  currency
+                  amount
+                }
+              }
             }
-            gross {
-              ${product.amount}
-            }
-            tax {
-              ${product.amount}
-            }
+           
           }
         }
       }
@@ -373,4 +401,51 @@ export default class SaleorService {
     return data;
   }
 
+  async setProductChannelListing(product) {
+    const query =`
+    mutation {
+      productChannelListingUpdate(id: "${product.id}", input: 
+        {updateChannels: 
+          {channelId: "${product.channelId}"
+            isAvailableForPurchase:true
+            isPublished:true
+          }
+        }) 
+      {
+        product {
+          id
+        }
+        errors{
+          field
+          message
+        }
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+  }
+
+  async setProductVariantChannelListing(variant,channelId) {
+    const query =`
+    mutation{
+      productVariantChannelListingUpdate(id:"${variant.id}" input:{
+        channelId:"${channelId}"
+        price:${variant.price}
+      })
+      {
+        variant{
+          id
+          name
+        }
+        errors{
+          field
+          message
+        }
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+  }
 }

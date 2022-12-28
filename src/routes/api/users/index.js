@@ -1,8 +1,8 @@
 import { Router } from "express";
-
+import permissions from "../../../middlewares/permissions.js";
 const router = Router();
 
-router.post('/',function(req,res,next){
+router.post('/',permissions.isAdmin,function(req,res,next){
   try{
     res.send({
       data:[

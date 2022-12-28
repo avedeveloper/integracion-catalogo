@@ -34,43 +34,60 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts(channel, size) {
+  async getProducts(channel, size,city) {
     const query = `
     query{
-      products(
-        first: ${size || 10}
-        channel: "${channel}"
-      ) {
-        edges {
-          node {
+      products(first:${size} channel:"${channel}"){
+        edges{
+          node{
             id
             name
-            pricing {
-              priceRange {
-                start {
-                  gross {
-                    amount
-                    currency
-                  }
-                }
-              }
-              discount {
-                gross {
-                  amount
-                  currency
-                }
-              }
-              priceRangeUndiscounted {
-                start {
-                  gross {
-                    amount
-                    currency
-                  }
-                }
-              }
-            }
-            thumbnail {
+            isAvailable
+            channel
+            seoDescription
+            description
+            thumbnail{
               url
+              alt
+            }
+            productType{
+              id
+              name
+            }
+            isAvailableForPurchase
+            collections{
+              id
+              name
+            }
+            variants{
+              id
+              name
+              stocks{
+                id
+                warehouse{
+                  name
+                  id
+                }
+                quantity
+              }
+              sku
+              pricing(address:{city:"${city}"}){
+                price{
+                  currency
+                  tax{
+                    currency
+                    amount
+                  }
+                  gross{
+                    currency
+                    amount
+                  }
+                  net{
+                    currency
+                    amount
+                  }
+                }
+              }
             }
           }
         }

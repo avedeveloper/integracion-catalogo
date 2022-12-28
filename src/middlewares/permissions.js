@@ -1,5 +1,5 @@
-import User from "../model/Users";
-import Role from "../model/Roles";
+import User from "../model/Users.js";
+import Role from "../model/Roles.js";
 
 
 const isMoterator = async (req, res, next) => {
@@ -20,11 +20,10 @@ const isMoterator = async (req, res, next) => {
 const isAdmin = async (req, res, next) => {
   if (req.user.role.includes("admin")) {
     const user = await User.findById(req.user.id);
-    const role = await Role.find({ name: { $in: user.roles } });
-
+    const role = await Role.find({ _id: { $in: user.roles } });
     for (let i = 0; i < role.length; i++) {
       if (role[i].name === "admin") {
-        next();
+        return next();
       }
     }
     next("You are not an admin");
@@ -55,4 +54,4 @@ const isGuest = (req, res, next) => {
     next("You are not a guest");
   }
 }
-export { isMoterator, isAdmin, isUser, isGuest };
+export default { isMoterator, isAdmin, isUser, isGuest };

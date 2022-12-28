@@ -4,15 +4,16 @@ import http from "http";
 import cors from "cors";
 import bodyParser from "body-parser";
 import express_session from "express-session";
-import colors from "colors";
-import api from "./src/routes/api.js";
+import "colors";
 import connection_db_ave from "./src/db/db_ave.js";
 import notfound from './src/middlewares/notfound.js';
 import login from './src/routes/admin/login.js';
 import handlerError from './src/middlewares/handlerErrors.js';
 import auth from "./src/middlewares/auth.js";
 import products from "./src/routes/api/products/index.js";
-import { createRoles } from "./src/libs/initialSetups.js";
+import cron from "./src/routes/api/cron/index.js";
+import users from "./src/routes/api/users/index.js";
+import { createRoles,createCategories } from "./src/libs/initialSetups.js";
 // CONFIG DOTENV
 var config = dotenv.config();
 global.config = config.parsed;
@@ -44,7 +45,7 @@ console.log("----------- SUCCESS ENV".green);
 
 // CONFIG EXPRESS
 const app = express();
-createRoles();
+createRoles();createCategories();
 const server = http.Server(app);
 if(process.env.environment == "development"){
   console.log("----------- DEVELOPE MODE -------------".blue);
@@ -82,16 +83,10 @@ console.log("----------- SUCCESS DB CONNECTION".green);
 // CONFIG ROUTES
 console.log("----------- CONFIG ROUTES".white);
 app.use("/admin",login);
-
-
-
 app.use(auth)
+app.use("/api/cron", cron);
 app.use("/api/products", products);
-
-app.use("/",function(req,res,next){
-  res.send({use:req.user})
-})
-
+app.use("/api/users", users);
 app.use(handlerError)
 app.use(notfound);
 

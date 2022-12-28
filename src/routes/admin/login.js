@@ -22,7 +22,7 @@ router.post("/login", async (req, res, next) => {
     const passwordIsValid = await  Users.comparePassword(password, db_res.password);
     if (!passwordIsValid) return next("Email or password is wrong");
     const token = jwt.sign({ id: db_res._id, role: db_res.roles.map(e=>e.name) }, process.env.SECRET, { expiresIn: 86400 });
-    res.status(200).send({ token });
+    res.status(200).send({ token, role: db_res.roles.map(e=>e.name)});
   } catch (err) {
     console.log(err,"error");
     next(err);

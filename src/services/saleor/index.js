@@ -34,10 +34,10 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts(size,address) {
+  async getProducts(size,address,cursor) {
     const query = `
     query{
-      products(first:${size}){
+      products(first:${size} ${cursor ==''? ``:`after:"${cursor}"`}){
         edges{
           node{
             id
@@ -90,7 +90,15 @@ export default class SaleorService {
               }
             }
           }
+          cursor
         }
+        pageInfo{
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+        totalCount
       }
     }
     `;
@@ -99,10 +107,10 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
-  async getProductsWithChannel(channel, size,address) {
+  async getProductsWithChannel(channel, size,address,cursor) {
     const query = `
     query{
-      products(first:${size}  channel:"${channel}"){
+      products(first:${size}  channel:"${channel}" ${cursor ==''? ``:`after:"${cursor}"`}){
         edges{
           node{
             id

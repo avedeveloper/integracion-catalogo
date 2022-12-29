@@ -28,14 +28,15 @@ async function createVariantProduct(saleor,product, variant){
     return {errors};
   }
 }
-async function getProducts(channel,size,address){
+async function getProducts(channel,size,address,after){
   const saleor = new SaleorService();
   await saleor.getToken();
   let products = null
+  let cursor = after === undefined ? '' : after;
   if(!(channel === "" || channel === undefined)){
-    products = await saleor.getProductsWithChannel(channel,size,address);
+    products = await saleor.getProductsWithChannel(channel,size,address,cursor);
   }else{
-    products = await saleor.getProducts(size,address);
+    products = await saleor.getProducts(size,address,cursor);
   }
   return products;
 

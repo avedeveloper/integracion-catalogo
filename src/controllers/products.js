@@ -48,4 +48,30 @@ async function getProduct(id,channel,address){
   return product;
 }
 
-export default { createProduct,getProducts,getProduct};
+async function updateProduct(id, newProduct){
+  const saleor = new SaleorService();
+  await saleor.getToken();
+  const product = await saleor.updateProduct(id,newProduct);
+  if(newProduct.hasOwnProperty('channel')){
+    await saleor.updateProductChannelListing(id,newProduct.channel);
+  }
+  if(newProduct.hasOwnProperty('variants')){
+    newProduct.variants.map(async (variant)=>{
+      return await updateVariantProduct(saleor,id,variant);
+    })
+  }
+  return {msg:"product updated"};
+}
+async function updateVariantProduct(saleor,id, variant){
+  try{
+    
+    await saleor.updateVariantProduct(id,variant);
+    if(variant.hasOwnProperty('channel')){
+      await saleor.setProductVariantChannelListing(id,variant);
+    }
+  }catch(errors){
+    console.log(errors)
+    return {errors};
+  }
+}
+export default { createProduct,getProducts,getProduct,updateProduct};

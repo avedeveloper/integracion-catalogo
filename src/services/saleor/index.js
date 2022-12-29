@@ -34,10 +34,10 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts(size,address,cursor) {
+  async getProducts(size, address, cursor) {
     const query = `
     query{
-      products(first:${size} ${cursor ==''? ``:`after:"${cursor}"`}){
+      products(first:${size} ${cursor == '' ? `` : `after:"${cursor}"`}){
         edges{
           node{
             id
@@ -107,10 +107,10 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
-  async getProductsWithChannel(channel, size,address,cursor) {
+  async getProductsWithChannel(channel, size, address, cursor) {
     const query = `
     query{
-      products(first:${size}  channel:"${channel}" ${cursor ==''? ``:`after:"${cursor}"`}){
+      products(first:${size}  channel:"${channel}" ${cursor == '' ? `` : `after:"${cursor}"`}){
         edges{
           node{
             id
@@ -172,7 +172,7 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
-  async getProduct(id,channel,address) {
+  async getProduct(id, channel, address) {
     const query = `
     query{
       product(id: "${id}", channel: "${channel}") {
@@ -355,7 +355,7 @@ export default class SaleorService {
       productCreate(
                 input: {
                       category: "${product.category}"
-                      collections: [${product.collection.map(e=>{return `"${e}"`})}]
+                      collections: [${product.collection.map(e => { return `"${e}"` })}]
                       name: "${product.name}"
                       rating: ${product.raiting}
                       productType: "${product.productType}"
@@ -476,15 +476,15 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
-  async setVariantProduct(variant,id) {
+  async setVariantProduct(variant, id) {
     const query = `
     mutation {
       productVariantCreate(input:{
         product:"${id}"
         name:"${variant.name}"
         sku:"${variant.sku}"
-        attributes:[${variant.attributes.map(e=>`{id:"${e.id}" plainText:"${e.plainText}"}`)}]
-        stocks:[${variant.stocks.map(e=>`{warehouse:"${e.warehouse}" quantity:${e.quantity}}`)}]
+        attributes:[${variant.attributes.map(e => `{id:"${e.id}" plainText:"${e.plainText}"}`)}]
+        stocks:[${variant.stocks.map(e => `{warehouse:"${e.warehouse}" quantity:${e.quantity}}`)}]
       }){
       productVariant{
         id
@@ -538,7 +538,7 @@ export default class SaleorService {
   }
 
   async setProductChannelListing(product) {
-    const query =`
+    const query = `
     mutation {
       productChannelListingUpdate(id: "${product.id}", input: 
         {updateChannels: 
@@ -562,8 +562,8 @@ export default class SaleorService {
     return data;
   }
 
-  async setProductVariantChannelListing(variant,channelId) {
-    const query =`
+  async setProductVariantChannelListing(variant, channelId) {
+    const query = `
     mutation{
       productVariantChannelListingUpdate(id:"${variant.id}" input:{
         channelId:"${channelId}"
@@ -584,4 +584,51 @@ export default class SaleorService {
     const { data } = response;
     return data;
   }
+  async updateProduct(id, newProduct) {
+    const query = `
+    mutation {
+      productUpdate(id:"${id}" input:{
+        ${newProduct.name ? `name:"${newProduct.name}"` : ``}
+        ${newProduct.description ? `description:"${newProduct.description}"` : ``}
+        ${newProduct.category ? `category:"${newProduct.category}"` :``}
+        ${newProduct.collection ? `collections:[${newProduct.collection.map(e => { return `"${e}"` })}]` : ``}
+        ${newProduct.weight ? `weight:${newProduct.weight}` : ``}
+        ${newProduct.slug ? `slug:"${newProduct.slug}"` : ``}
+        ${newProduct.chargeTaxes ? `chargeTaxes:${newProduct.chargeTaxes}` : ``}
+        ${newProduct.raiting ? `rating:${newProduct.raiting}` : ``}
+      })
+      {
+        product{
+          id
+          name
+          description
+        }
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+  }
+  async updateVariantProduct(id, newVariant) {
+  const query = `
+  mutation{
+    productVariantUpdate(id:"${id}" input:{
+      ${newVariant.name ? `name:"${newVariant.name}"` : ``}
+      ${newVariant.sku ? `sku:"${newVariant.sku}"` : ``}
+      ${newVariant.attributes ? `attributes:[${newVariant.attributes.map(e => { return `{id:"${e.id}" plainText:"${e.plainText}"}` })}]` : ``}
+      ${newVariant.stocks ? `stocks:[${newVariant.stocks.map(e => { return `{warehouse:"${e.warehouse}" quantity:${e.quantity}}` })}]` : ``}
+      ${newVariant.weight ? `weight:${newVariant.weight}` : ``}
+    }){
+      productVariant{
+        product{
+          name
+        }
+      }
+    }
+  }`
+  const response = await this.client.link.post('', { query });
+  const { data } = response;
+  return data;
 }
+}
+

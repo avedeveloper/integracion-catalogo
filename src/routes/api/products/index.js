@@ -5,10 +5,11 @@ const router = Router();
 router.post("/", async (req, res,next) => {
   const {body} = req;
   const {channel, size,address} = body;
-  if(!channel || !size){
+  console.log(channel, size,address)
+  if(!channel || !size || !address){
     next("channel and size are required");
   }
-  const products = await product.getProducts(channel,size,address||"CO");
+  const products = await product.getProducts(channel,size,address);
   res.send({ products });
 });
 
@@ -47,14 +48,17 @@ router.post("/", async (req, res,next) => {
 
 router.post('/product',async(req,res,next)=>{
   const {body} = req;
-  const {id} = body;
-  if(!id){
-    next("id is required");
+  const {id,channel,address} = body;
+  if(!id || !channel || !address){
+    next("id,channel and address are required");
   }
-  const saleor = new SaleorService();
-  await saleor.getToken();
-  const product = await saleor.getProduct(id);
-  res.send({product});
+try{
+  const data = await product.getProduct(id,channel,address);
+  res.send({data});
+}catch(err){
+  next(err);
+  console.log(err)
+}
 })
 router.post('/setProduct',async (req,res,next)=>{
   const {body} = req;

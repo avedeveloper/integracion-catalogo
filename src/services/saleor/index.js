@@ -34,7 +34,7 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts(channel, size,city) {
+  async getProducts(channel, size,address) {
     const query = `
     query{
       products(first:${size} channel:"${channel}"){
@@ -71,7 +71,7 @@ export default class SaleorService {
                 quantity
               }
               sku
-              pricing(address:{city:"${city}"}){
+              pricing(address:{city:"${address}"}){
                 price{
                   currency
                   tax{
@@ -94,19 +94,65 @@ export default class SaleorService {
       }
     }
     `;
-    /*agregarle un header al axios */
+    console.log(query)
     const response = await this.client.link.post('', { query });
     const { data } = response;
     return data;
   }
-  async getProduct(id) {
+  async getProduct(id,channel,address) {
     const query = `
     query{
-      product(id:"${id}") {
+      product(id: "${id}", channel: "${channel}") {
         id
         name
-        thumbnail{
+        thumbnail {
           url
+          alt
+        }
+        description
+        isAvailableForPurchase
+        availableForPurchaseAt
+        collections {
+          id
+          channel
+          name
+        }
+        media {
+          url
+          alt
+        }
+        variants {
+          id
+          sku
+          name
+          stocks {
+            id
+            warehouse {
+              id
+              name
+            }
+            quantity
+            quantityAllocated
+          }
+          media {
+            url
+            alt
+          }
+          pricing(address: {country: ${address}}) {
+            price {
+              currency
+              gross {
+                amount
+              }
+              net {
+                amount
+              }
+              tax {
+                amount
+              }
+            }
+            onSale
+          }
         }
       }
     }

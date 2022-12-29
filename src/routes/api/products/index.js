@@ -6,11 +6,15 @@ router.post("/", async (req, res,next) => {
   const {body} = req;
   const {channel, size,address} = body;
   console.log(channel, size,address)
-  if(!channel || !size || !address){
+  if( !size || !address){
     next("channel and size are required");
   }
+try{
   const products = await product.getProducts(channel,size,address);
   res.send({ products });
+}catch(err){
+  next(err);
+}
 });
 
 // router.post("/create", async (req, res,next) => {

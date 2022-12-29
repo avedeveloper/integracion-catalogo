@@ -34,10 +34,75 @@ export default class SaleorService {
     this.client.link.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return token;
   }
-  async getProducts(channel, size,address) {
+  async getProducts(size,address) {
     const query = `
     query{
-      products(first:${size} channel:"${channel}"){
+      products(first:${size}){
+        edges{
+          node{
+            id
+            name
+            isAvailable
+            channel
+            seoDescription
+            description
+            thumbnail{
+              url
+              alt
+            }
+            productType{
+              id
+              name
+            }
+            isAvailableForPurchase
+            collections{
+              id
+              name
+            }
+            variants{
+              id
+              name
+              stocks{
+                id
+                warehouse{
+                  name
+                  id
+                }
+                quantity
+              }
+              sku
+              pricing(address:{city:"${address}"}){
+                price{
+                  currency
+                  tax{
+                    currency
+                    amount
+                  }
+                  gross{
+                    currency
+                    amount
+                  }
+                  net{
+                    currency
+                    amount
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    `;
+    console.log(query)
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+  }
+  async getProductsWithChannel(channel, size,address) {
+    const query = `
+    query{
+      products(first:${size}  channel:"${channel}"){
         edges{
           node{
             id

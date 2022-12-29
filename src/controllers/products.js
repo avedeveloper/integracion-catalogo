@@ -31,8 +31,14 @@ async function createVariantProduct(saleor,product, variant){
 async function getProducts(channel,size,address){
   const saleor = new SaleorService();
   await saleor.getToken();
-  const products = await saleor.getProducts(channel,size,address);
+  let products = null
+  if(!(channel === "" || channel === undefined)){
+    products = await saleor.getProductsWithChannel(channel,size,address);
+  }else{
+    products = await saleor.getProducts(size,address);
+  }
   return products;
+
 }
 async function getProduct(id,channel,address){
   const saleor = new SaleorService();

@@ -2,19 +2,19 @@ import { Router } from "express";
 import product from "../../../controllers/products.js";
 const router = Router();
 
-router.post("/", async (req, res,next) => {
-  const {body} = req;
-  const {channel, size,address,after} = body;
-  console.log(channel, size,address)
-  if( !size || !address){
+router.post("/", async (req, res, next) => {
+  const { body } = req;
+  const { channel, size, address, after } = body;
+  console.log(channel, size, address)
+  if (!size || !address) {
     next("channel and size are required");
   }
-try{
-  const products = await product.getProducts(channel,size,address,after);
-  res.send({ products });
-}catch(err){
-  next(err);
-}
+  try {
+    const products = await product.getProducts(channel, size, address, after);
+    res.send({ products });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // router.post("/create", async (req, res,next) => {
@@ -50,71 +50,32 @@ try{
 //   res.send({ productCreated });
 // });
 
-router.post('/product',async(req,res,next)=>{
-  const {body} = req;
-  const {id,channel,address} = body;
-  if(!id || !channel || !address){
+router.post('/product', async (req, res, next) => {
+  const { body } = req;
+  const { id, channel, address } = body;
+  if (!id || !channel || !address) {
     next("id,channel and address are required");
   }
-try{
-  const data = await product.getProduct(id,channel,address);
-  res.send({data});
-}catch(err){
-  next(err);
-  console.log(err)
-}
-})
-router.post('/setProduct',async (req,res,next)=>{
-  const {body} = req;
-  const {product} = body;
-  if(!product){
-    next("product is required");
+  try {
+    const data = await product.getProduct(id, channel, address);
+    res.send({ data });
+  } catch (err) {
+    next(err);
+    console.log(err)
   }
-
-  res.send({address});
 })
 
-router.post('/isAvaiable',async (req,res,next)=>{
-  const {body} = req;
-  const {product} = body;
-  if(!product){
-    next("product is required");
+router.post('/productUpdate', async (req, res, next) => {
+  const { body } = req;
+  const { product,id } = body;
+  if (!product)next("product is required");
+  try {
+    const data = await product.updateProduct(id,product);
+    res.send({ data });
+  } catch (err) {
+    next(err);
   }
-  const saleor = new SaleorService();
-  await saleor.getToken();
-  const address = await saleor.getAddress(product);
-  res.send({address});
-
 })
 
-router.post('/categories', async (req,res,next)=>{
-  const saleor = new SaleorService();
-  await saleor.getToken();
-  const categories = await saleor.getCategories();
-  res.send({categories});
-})
-
-router.post('/category', async (req,res,next)=>{
-  const {body} = req;
-  const {id} = body;
-  if(!id){
-    next("id is required");
-  }
-  const saleor = new SaleorService();
-  await saleor.getToken();
-  const category = await saleor.getCategory(id);
-  res.send({category});
-})
-
-router.post('/variantsProducts',async (req,res,next)=>{
-  const {body} = req;
-  const {channel,size} = body;
-  if(!channel || !size){
-    next("channel and size are required");
-  }
-  const saleor = new SaleorService();
-  const variantsProducts = await saleor.getVariantsProducts(channel,size);
-  res.send({variantsProducts});
-})
 
 export default router;

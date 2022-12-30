@@ -76,6 +76,8 @@ if (process.env.environment == "production") {
   app.use(cors(corsOptions));
   console.log("----------- CORS ENABLED IN PRODUCTION".yellow);
 }
+/*access controll allow origin */
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.disable("x-powered-by");
 app.use(express_session({

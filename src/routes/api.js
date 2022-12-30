@@ -1,7 +1,6 @@
 import {Router} from 'express';
-import SaleorService from '../services/saleor/index.js';
 var router = Router();
-
+import promoController from '../controllers/apiPromoController.js'
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
   console.log('Time: ', Date.now());
@@ -9,17 +8,12 @@ router.use(function timeLog(req, res, next) {
 }
 );
 
-
-router.post('/products',async function(req,res,next) {
-  try{
-  const saleorService = new SaleorService();
-  const token = await saleorService.getToken();
-  const products = await saleorService.getProducts();
-  res.send({token,products});
-
-  }catch(err){
-  console.log(err);
-  next(err);
-  }
+router.get('/', async (req, res) => {
+  const promos = await promoController.getAllIdsCategories();
+  res.json(promos);
 })
+
+
+
+
 export default router;

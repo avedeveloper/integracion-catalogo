@@ -64,18 +64,11 @@ if (process.env.environment == "development") {
   };
   app.use(cors(corsOptions));
   console.log("----------- CORS ENABLED".yellow);
+}else{
+  console.log("----------- PRODUCTION MODE -------------".blue);
+  app.use(cors());
 }
-if (process.env.environment == "production") {
-  var corsOptions = {
-    credentials: true,
-    origin: [
-      "http://192.168.20.24:5173/",
-      "http://172.28.96.1:5173/"
-    ]
-  }
-  app.use(cors(corsOptions));
-  console.log("----------- CORS ENABLED IN PRODUCTION".yellow);
-}
+
 /*access controll allow origin */
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

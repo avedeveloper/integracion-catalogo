@@ -13,7 +13,8 @@ import auth from "./src/middlewares/auth.js";
 import products from "./src/routes/api/products/index.js";
 import cron from "./src/routes/api/cron/index.js";
 import users from "./src/routes/api/users/index.js";
-import { createRoles,createCategories } from "./src/libs/initialSetups.js";
+import { createRoles, createCategories } from "./src/libs/initialSetups.js";
+import pruebas from './src/routes/api.js';
 // CONFIG DOTENV
 var config = dotenv.config();
 global.config = config.parsed;
@@ -45,9 +46,9 @@ console.log("----------- SUCCESS ENV".green);
 
 // CONFIG EXPRESS
 const app = express();
-createRoles();createCategories();
+createRoles(); createCategories();
 const server = http.Server(app);
-if(process.env.environment == "development"){
+if (process.env.environment == "development") {
   console.log("----------- DEVELOPE MODE -------------".blue);
   var corsOptions = {
     credentials: true,
@@ -63,7 +64,17 @@ if(process.env.environment == "development"){
   };
   app.use(cors(corsOptions));
   console.log("----------- CORS ENABLED".yellow);
-
+}
+if (process.env.environment == "production") {
+  var corsOptions = {
+    credentials: true,
+    origin: [
+      "http://192.168.20.24:5173/",
+      "http://172.28.96.1:5173/"
+    ]
+  }
+  app.use(cors(corsOptions));
+  console.log("----------- CORS ENABLED IN PRODUCTION".yellow);
 }
 app.use(bodyParser.json());
 app.disable("x-powered-by");
@@ -82,11 +93,12 @@ console.log("----------- SUCCESS DB CONNECTION".green);
 //Initial set up
 // CONFIG ROUTES
 console.log("----------- CONFIG ROUTES".white);
-app.use("/admin",login);
+app.use("/admin", login);
 app.use(auth)
 app.use("/api/cron", cron);
 app.use("/api/products", products);
 app.use("/api/users", users);
+app.use("/api", pruebas);
 app.use(handlerError)
 app.use(notfound);
 
@@ -95,6 +107,6 @@ app.use(notfound);
 
 console.log("----------- SUCCESS ROUTES".green);
 console.log("----------- SUCCESS SERVER".green);
-console.log("----------- SERVER RUN ON PORT:".green,process.env.PORT.rainbow);
+console.log("----------- SERVER RUN ON PORT:".green, process.env.PORT.rainbow);
 server.listen(process.env.PORT);
 console.log("---------------------------------------".green);

@@ -4,14 +4,18 @@ async function createProduct(data){
 try{
   const product = new Product(data);
   const saleor = new SaleorService();
-  let token = await saleor.getToken();
+  await saleor.getToken();
   const productCreated = await saleor.setProduct(product);
+  if(productCreated.data.productCreate.errors[0] !== undefined)return productCreated.data.productCreate.errors[0];
   product.id = productCreated.data.productCreate.product.id
-  const productChannelListing = await saleor.setProductChannelListing(product);
-  const productVariants = product.variants.map(async (variant)=>{
-    return await createVariantProduct(saleor,product,variant);
-  })
-  return {token,productCreated,productChannelListing,productVariants};
+  await saleor.createMediaProduct(product);
+  await saleor.setProductChannelListing(product);
+  if(product.variants.length > 0){
+    product.variants.map(async (variant)=>{
+      return await createVariantProduct(saleor,product,variant);
+    })
+  }
+  return {msg:"product created"};
 }catch(e){
   console.log(e)
   return e;

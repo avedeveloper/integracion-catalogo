@@ -12,8 +12,8 @@ export default class SaleorService {
   };
 
   async getToken() {
-    const email = "davidfa9718@gmail.com"
-    const password = "Saleor123+"
+    const email = "castanolagustin@gmail.com"
+    const password = "49sL3T4cASRLB6Y"
     const query = `
       mutation {
         tokenCreate(email: "${email}", password: "${password}") {
@@ -359,6 +359,11 @@ export default class SaleorService {
                       name: "${product.name}"
                       rating: ${product.raiting}
                       productType: "${product.productType}"
+                     ${product.description ? `description: "${product.description}"` : ``}
+                      ${product.seoDescription ? `seoDescription: "${product.seoDescription}"` : ``}
+                      ${product.seoTitle ? `seoTitle: "${product.seoTitle}"` : ``}
+                      ${product.metadata ? `metadata: [${product.metadata.map(e => { return `{key:"${e.key}" value:"${e.value}"}` })}]` : ``}
+                      ${product.attributes? `attributes:[${product.attributes.map(e=>{return `{id:"${e.id}" plainText:"${e.plainText}"}`})}]`:``}
                 }) 
       {
         product {
@@ -372,6 +377,7 @@ export default class SaleorService {
 }
     `;
     try {
+      console.log(query)
       const response = await this.client.link.post('', { query });
       const { data } = response;
       return data;
@@ -630,5 +636,28 @@ export default class SaleorService {
   const { data } = response;
   return data;
 }
+  async createMediaProduct(product){
+    const query=`
+    mutation{
+      productMediaCreate(input:{
+        image:"${product.mediaUrl}"
+        alt:"${product.name}"
+        product:"${product.id}"
+      }){
+        product{
+          id
+          name
+        }
+        errors{
+          message
+          field
+        }
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+
+  }
 }
 

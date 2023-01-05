@@ -1,7 +1,7 @@
 import Promo from '../services/api/promocionales/index.js'
 import Product from '../model/product.js'
 import productsHandler from './products.js'
-// import categoriesController from './categoriesController.js'
+import diccionarioPromos from '../services/api/promocionales/promosHomologation.js'
 const channelPromos = "Q2hhbm5lbDoz"
 const IMAGE_BASE_URL = 'https://www.catalogospromocionales.com'
 async function getAllIdsCategories() {
@@ -20,15 +20,18 @@ async function getAllIdsCategories() {
   // )
   const productFilter = categoriasID[0].id
   const products = await Promo.getProductsByCategory(productFilter);
-  /*convertir la descripcion que viene en formato html a string */
-  let description = products[0].descripcionProducto.replace(/(<([^>]+)>)/gi, ``);
-  description = JSON.stringify(description);
-  console.log(description)
+// convertir la descripcion del producto a un string de json
+//quitarle los saltos de linea a la descripcion del producto
+  const descriptionProducto = products[0].descripcionProducto.replace(/(\r\n|\n|\r)/gm, "").replace(/"/g, '\\"');
+  let collectionProduct = await productsHandler.getCollection(products[0].nombre);
+  let categoriaProduct = await getCategoriasHomologadas(categoriasID[0]);
+  let categoriesFromSaelor = await productsHandler.getCategorieBySlug(categoriaProduct);
+  console.log("categorias",categoriesFromSaelor)
   const product = new Product({
-    name: products[0].nombre,
-    description: description,
-    category: "Q2F0ZWdvcnk6Mg==",
-    collection:["Q29sbGVjdGlvbjoz"],
+    name: productsHandler.cleanString(products[0].nombre),
+    description: "",
+    category: categoriesFromSaelor,
+    collection:[`${collectionProduct}`],
     productType: "UHJvZHVjdFR5cGU6NA==",
     currency: "CO",
     raiting: 3,
@@ -41,10 +44,22 @@ async function getAllIdsCategories() {
     metadata:[
     {key:"urlImageJPG", value:IMAGE_BASE_URL+products[0].imageUrl},
     {key:"referencia", value:products[0].referencia},
-    ]
+    {key:"precioSugerido",value:products[0].precio1},
+  {key:"descripcion", value:descriptionProducto}    ]
   })
   const productCreated = await productsHandler.createProduct(product);
   return {message:"ok", productCreated}
+  // return {message:"ok", descriptionProducto}
+}
+async function getCategoriasHomologadas(categoria){
+try{ 
+  const categoriaHomologada = diccionarioPromos["homologacion"].find(e => e.id == categoria.id);
+  return categoriaHomologada.slugAveChildrent ===''? categoriaHomologada.slugAve : categoriaHomologada.slugAveChildrent;
+}catch(e){
+  console.log(e)
+  return {message:"error",error:e}
+}
+
 }
 
 function sortCategories(categories) {

@@ -78,4 +78,46 @@ async function updateVariantProduct(saleor,id, variant){
     return {errors};
   }
 }
-export default { createProduct,getProducts,getProduct,updateProduct};
+async function getCollection(data){
+  try{
+    const saleor = new SaleorService();
+    await saleor.getToken();
+    data = data.toLowerCase();
+    if(data.includes("oferta")){
+      data = data.replace("oferta","")
+    }else if(data.includes("produccion nacional"))
+    {
+      data = "produccion-nacional"
+    }else
+    if(data.includes("precio neto")){
+      data = "precio-neto"
+    }else{
+      data = "precio-bruto"
+    }
+    console.log("productsmodel",data)
+    const collection = await saleor.getCollection(data);
+    return collection.data.collection.id;
+  }catch(e){
+    console.log(e)
+    return e;
+  }
+}
+function cleanString(str){
+  str = str.toLowerCase();
+  if(str.includes("oferta")){
+    str = str.replace("oferta","")}
+  if (str.includes("produccion nacional")){
+    str = str.replace("produccion nacional","")
+  }
+  if(str.includes("precio neto")){
+    str = str.replace("precio neto","")
+  }
+ return str;
+}
+async function getCategorieBySlug(slug){
+  const saleor = new SaleorService();
+  await saleor.getToken();
+  const category = await saleor.getCategorieBySlug(slug);
+  return category.data.category.id;
+}
+export default { createProduct,getProducts,getProduct,updateProduct,getCollection,cleanString,getCategorieBySlug};

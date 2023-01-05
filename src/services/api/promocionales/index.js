@@ -38,7 +38,6 @@ class ApiPromos {
         return response.data;
       }
 
-
 }
 export default ApiPromos;
 

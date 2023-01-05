@@ -278,7 +278,7 @@ export default class SaleorService {
   async getCollection(id) {
     const query = `
     query{
-      collection(id:"${id}") {
+      collection(slug:"${id}") {
         id
         name
       }
@@ -359,7 +359,7 @@ export default class SaleorService {
                       name: "${product.name}"
                       rating: ${product.raiting}
                       productType: "${product.productType}"
-                     ${product.description ? `description: "${product.description}"` : ``}
+                     ${product.description ? `description: ${product.description}` : ``}
                       ${product.seoDescription ? `seoDescription: "${product.seoDescription}"` : ``}
                       ${product.seoTitle ? `seoTitle: "${product.seoTitle}"` : ``}
                       ${product.metadata ? `metadata: [${product.metadata.map(e => { return `{key:"${e.key}" value:"${e.value}"}` })}]` : ``}
@@ -658,6 +658,17 @@ export default class SaleorService {
     const { data } = response;
     return data;
 
+  }
+  async getCategorieBySlug(slug){
+    const query=`
+    query{
+      category(slug:"${slug}"){
+        id
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
   }
 }
 

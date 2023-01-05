@@ -406,5 +406,113 @@
   {
     "CATEGORIA AVE": "Oficina y Negocios",
     "SUBCATEGORIA AVE": "Todos"
+  },
+  {
+    "CATEGORIA AVE": "Paraguas e impermeables",
+    "SUBCATEGORIA AVE": "Paraguas Golf"
+  },
+  {
+    "CATEGORIA AVE": "Paraguas e impermeables",
+    "SUBCATEGORIA AVE": "Paraguas Mini"
+  },
+  {
+    "CATEGORIA AVE": "Paraguas e impermeables",
+    "SUBCATEGORIA AVE": "Paraguas Premium"
+  },
+  {
+    "CATEGORIA AVE": "Paraguas e impermeables",
+    "SUBCATEGORIA AVE": "Impermeables"
+  },
+  {
+    "CATEGORIA AVE": "Paraguas e impermeables",
+    "SUBCATEGORIA AVE": "Todos"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Pharma"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Gel y liquidos antibacteriales"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Masajeadores"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Mentas"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Pastilleros"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Protectores solares"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Belleza"
+  },
+  {
+    "CATEGORIA AVE": "Salud y cuidado Personal",
+    "SUBCATEGORIA AVE": "Todos"
+  },
+  {
+    "CATEGORIA AVE": "Produccion Nacional",
+    "SUBCATEGORIA AVE": ""
+  },
+  {
+    "CATEGORIA AVE": "Alimentos y bebidas",
+    "SUBCATEGORIA AVE": ""
+  },
+  {
+    "CATEGORIA AVE":"Mascotas",
+    "SUBCATEGORIA AVE":""
+  },
+  {
+    "CATEGORIA AVE":"Viaje",
+    "SUBCATEGORIA AVE":""
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Accesorios de Computador"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Accesorios para Automovil"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Accesorios para moviles"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Speakers"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Audifonos"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Cables y Adaptadores de carga"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Hubs"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Pilas Power Bank"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Relojes"
+  },
+  {
+    "CATEGORIA AVE":"Tecnología",
+    "SUBCATEGORIA AVE":"Todos"
   }
 ]

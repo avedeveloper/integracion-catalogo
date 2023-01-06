@@ -12,8 +12,8 @@ export default class SaleorService {
   };
 
   async getToken() {
-    const email = "davidfa9718@gmail.com"
-    const password = "Saleor123+"
+    const email = "castanolagustin@gmail.com"
+    const password = "49sL3T4cASRLB6Y"
     const query = `
       mutation {
         tokenCreate(email: "${email}", password: "${password}") {
@@ -49,6 +49,10 @@ export default class SaleorService {
             thumbnail{
               url
               alt
+            }
+            metadata{
+              key
+              value
             }
             productType{
               id
@@ -184,6 +188,10 @@ export default class SaleorService {
         }
         description
         isAvailableForPurchase
+        metadata{
+          key
+          value
+        }
         availableForPurchaseAt
         collections {
           id
@@ -198,6 +206,10 @@ export default class SaleorService {
           id
           sku
           name
+          metadata{
+            key
+            value
+          }
           stocks {
             id
             warehouse {
@@ -278,7 +290,7 @@ export default class SaleorService {
   async getCollection(id) {
     const query = `
     query{
-      collection(id:"${id}") {
+      collection(slug:"${id}") {
         id
         name
       }
@@ -359,6 +371,11 @@ export default class SaleorService {
                       name: "${product.name}"
                       rating: ${product.raiting}
                       productType: "${product.productType}"
+                     ${product.description ? `description: ${product.description}` : ``}
+                      ${product.seoDescription ? `seoDescription: "${product.seoDescription}"` : ``}
+                      ${product.seoTitle ? `seoTitle: "${product.seoTitle}"` : ``}
+                      ${product.metadata ? `metadata: [${product.metadata.map(e => { return `{key:"${e.key}" value:"${e.value}"}` })}]` : ``}
+                      ${product.attributes? `attributes:[${product.attributes.map(e=>{return `{id:"${e.id}" plainText:"${e.plainText}"}`})}]`:``}
                 }) 
       {
         product {
@@ -372,6 +389,7 @@ export default class SaleorService {
 }
     `;
     try {
+      console.log(query)
       const response = await this.client.link.post('', { query });
       const { data } = response;
       return data;
@@ -485,6 +503,7 @@ export default class SaleorService {
         sku:"${variant.sku}"
         attributes:[${variant.attributes.map(e => `{id:"${e.id}" plainText:"${e.plainText}"}`)}]
         stocks:[${variant.stocks.map(e => `{warehouse:"${e.warehouse}" quantity:${e.quantity}}`)}]
+        metadata:[${variant.metadata.map(e => `{key:"${e.key}" value:"${e.value}"}`)}]
       }){
       productVariant{
         id
@@ -630,5 +649,40 @@ export default class SaleorService {
   const { data } = response;
   return data;
 }
+  async createMediaProduct(product){
+    const query=`
+    mutation{
+      productMediaCreate(input:{
+        image:"${product.mediaUrl}"
+        alt:"${product.name}"
+        product:"${product.id}"
+      }){
+        product{
+          id
+          name
+        }
+        errors{
+          message
+          field
+        }
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+
+  }
+  async getCategorieBySlug(slug){
+    const query=`
+    query{
+      category(slug:"${slug}"){
+        id
+        name
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data;
+  }
 }
 

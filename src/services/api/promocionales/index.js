@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 var config = dotenv.config();
 
 const BASE_URL = process.env.URL_API_CATAPROMO
-const IMAGE_BASE_URL = 'https://www.catalogospromocionales.com'
 const apiPromos = axios.create({
     baseURL: BASE_URL,
     headers: {
@@ -25,7 +24,7 @@ class ApiPromos {
     }
     static async getProductsByCategory(id){
         const response = await apiPromos.get(`/categorias/${id}/productos`);
-        return response.data;
+        return response.data.resultado;
     }
     static async getProductById(id){
         const response = await apiPromos.get(`/productos/${id}`);
@@ -34,12 +33,14 @@ class ApiPromos {
     static async getAllIdsCategories(){
         const response = await apiPromos.get('/categorias');
         if(response.data.hayError == false){
-            let ids = response.data.resultado.map((e)=>e.id)
-            return ids;
+            return response.data.resultado
         }
         return response.data;
       }
-
+    static async getProductsVariantsByProduct(id){
+        const response = await apiPromos.get(`stock/${id}`);
+        return response.data;
+    }
 
 }
 export default ApiPromos;

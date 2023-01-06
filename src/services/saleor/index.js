@@ -50,6 +50,10 @@ export default class SaleorService {
               url
               alt
             }
+            metadata{
+              key
+              value
+            }
             productType{
               id
               name
@@ -184,6 +188,10 @@ export default class SaleorService {
         }
         description
         isAvailableForPurchase
+        metadata{
+          key
+          value
+        }
         availableForPurchaseAt
         collections {
           id
@@ -198,6 +206,10 @@ export default class SaleorService {
           id
           sku
           name
+          metadata{
+            key
+            value
+          }
           stocks {
             id
             warehouse {
@@ -491,6 +503,7 @@ export default class SaleorService {
         sku:"${variant.sku}"
         attributes:[${variant.attributes.map(e => `{id:"${e.id}" plainText:"${e.plainText}"}`)}]
         stocks:[${variant.stocks.map(e => `{warehouse:"${e.warehouse}" quantity:${e.quantity}}`)}]
+        metadata:[${variant.metadata.map(e => `{key:"${e.key}" value:"${e.value}"}`)}]
       }){
       productVariant{
         id
@@ -664,6 +677,7 @@ export default class SaleorService {
     query{
       category(slug:"${slug}"){
         id
+        name
       }
     }`
     const response = await this.client.link.post('', { query });

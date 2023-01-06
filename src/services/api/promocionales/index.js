@@ -37,6 +37,10 @@ class ApiPromos {
         }
         return response.data;
       }
+    static async getProductsVariantsByProduct(id){
+        const response = await apiPromos.get(`stock/${id}`);
+        return response.data;
+    }
 
 }
 export default ApiPromos;

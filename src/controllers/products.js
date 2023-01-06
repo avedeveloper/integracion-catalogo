@@ -15,6 +15,7 @@ try{
       return await createVariantProduct(saleor,product,variant);
     })
   }
+  console.log(product.variants.length)
   return {msg:"product created"};
 }catch(e){
   console.log(e)
@@ -118,6 +119,6 @@ async function getCategorieBySlug(slug){
   const saleor = new SaleorService();
   await saleor.getToken();
   const category = await saleor.getCategorieBySlug(slug);
-  return category.data.category.id;
+  return {id:category.data.category.id,name:category.data.category.name};
 }
 export default { createProduct,getProducts,getProduct,updateProduct,getCollection,cleanString,getCategorieBySlug};

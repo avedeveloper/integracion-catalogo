@@ -2,6 +2,7 @@ import Promo from '../services/api/promocionales/index.js'
 import Product from '../model/product.js'
 import productsHandler from './products.js'
 import diccionarioPromos from '../services/api/promocionales/promosHomologation.js'
+import Bottleneck from "bottleneck";
 const channelPromos = "Q2hhbm5lbDoz"
 const IMAGE_BASE_URL = 'https://www.catalogospromocionales.com'
 const stockSettings = [{
@@ -17,93 +18,11 @@ const stockSettings = [{
   name: "Bodega local"
 }
 ]
-async function getAllIdsCategories() {
-  //conseguir las categorias existentes
-  const categoriasID = await Promo.getAllIdsCategories();
-  //luego de conseguir las categorias de promocionales, se obtienen los productos de cada categoria homologadas
-  // const categories = await sortCategories(categoriasID);
-  // const productsFilter = Promise.all(categoriasID.map(async (e) => {
-  //     // obtener los productos de cada categoria
-  //     const productos = await Promo.getProductsByCategory(e);
-  //     // guardar cada producto
-  //     productos.forEach(async (e) => {
-  //     });
-  //     return productos;
-  //   })
-  // )
-  const productFilter = categoriasID[0].id
-  const products = await Promo.getProductsByCategory(productFilter);
-  // convertir la descripcion del producto a un string de json
-  //quitarle los saltos de linea a la descripcion del producto
-  const descriptionProducto = products[0].descripcionProducto.replace(/(\r\n|\n|\r)/gm, "").replace(/"/g, '\\"');
-  let collectionProduct = await productsHandler.getCollection(products[0].nombre);
-  let categoriaProduct = await getCategoriasHomologadas(categoriasID[0]);
-  let categoriesFromSaelor = await productsHandler.getCategorieBySlug(categoriaProduct);
-  console.log("categorias", categoriesFromSaelor)
-  const product = new Product({
-    name: productsHandler.cleanString(products[0].nombre),
-    description: "",
-    category: categoriesFromSaelor.id,
-    collection: [`${collectionProduct}`],
-    productType: "UHJvZHVjdFR5cGU6NA==",
-    currency: "CO",
-    raiting: 3,
-    channelId: channelPromos,
-    mediaUrl: IMAGE_BASE_URL + products[0].imageUrl,
-    reference: products[0].referencia,
-    sku: products[0].referencia,
-    attributes: [],
-    variants: [],
-    metadata: [
-      { key: "urlImageJPG", value: IMAGE_BASE_URL + products[0].imageUrl },
-      { key: "referencia", value: products[0].referencia },
-      { key: "precioSugerido", value: products[0].precio1 },
-      { key: "descripcion", value: descriptionProducto },
-      { key: "categoria", value: categoriesFromSaelor.name },
-      { key: "distribuidor", value: "promos" },
-    ]
-  })
-  const productsVariants = await Promo.getProductsVariantsByProduct(products[0].referencia);
-  product.variants = productsVariants["resultado"].map((e) => {
-    return {
-      sku: `${e.referencia}-promos-${e.id}`,
-      price: e.precio1,
-      currency: "CO",
-      price: products[0].precio1,
-      name: products[0].nombre+"-"+e.color,
-      stocks: [
-        {
-          quantity: e.bodegaZonaFranca?e.bodegaZonaFranca:0,
-          warehouse: stockSettings[0].id
-      },{
-          quantity: e.cantidadTransito?e.cantidadTransito:0,
-          warehouse: stockSettings[1].id
-      },
-        {
-          quantity: e.bodegaLocal?e.bodegaLocal:0,
-          warehouse: stockSettings[2].id
-        }
-      ],
-      attributes:[{
-        id:"QXR0cmlidXRlOjI=",
-        plainText:"e.color"
-      }]
-      ,metadata: [
-        { key: "urlImageJPG", value: IMAGE_BASE_URL + e.imageUrl },
-        { key: "referencia", value: e.referencia },
-        { key: "precioSugerido", value: e.precio1 },
-        { key: "categoria", value: categoriesFromSaelor.name },
-        { key: "distribuidor", value: "promos" },
-        e.color ? { key: "color", value: e.color } : {},
-        {key:"estadoOrden",value:e.estadoOrden},
-        {key:"stockTotal",value:e.totalDisponible},
-      ]
-    }
-  })
-  const productCreated = await productsHandler.createProduct(product);
-  return { message: "ok", productCreated }
-  // return { message: "ok", product }
-}
+const limiter = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 1000
+});
+
 async function getCategoriasHomologadas(categoria) {
   try {
     const categoriaHomologada = diccionarioPromos["homologacion"].find(e => e.id == categoria.id);
@@ -115,55 +34,141 @@ async function getCategoriasHomologadas(categoria) {
 
 }
 
-function sortCategories(categories) {
-  let categoriesSort = [];
-  for (let i = 0; i < categories.length; i++) {
-    if (categories[i].idParent == null) {
-      categoriesSort.push({
-        id: categories[i].id,
-        name: categories[i].nombre,
-        children: []
-      })
-    }
-    if (categories[i].idParent != null) {
-      categoriesSort.forEach((e) => {
-        if (e.id == categories[i].idParent) {
-          e.children.push({
-            id: categories[i].id,
-            name: categories[i].nombre
+async function loadCatalogoProductsPromos(){
+try{
+  const categoriasID = await Promo.getAllIdsCategories();
+  for (let c = 2; c < categoriasID.length; c++) {
+      console.log("categoria",c)
+      let productFilter = categoriasID[c].id
+      let products = await Promo.getProductsByCategory(productFilter)
+      await loadProductsPromos(products,categoriasID[c]);
+  }
+  return {message:"ok"}
+}catch(e){
+  return {err:e}
+}
+}
+async function loadProductsPromos(products,categoriasID){
+try{
+  for(let p= 0;p < products.length;p++){
+    console.log("producto",p)
+    var product = products[p];
+    let checkProduct = await productsHandler.productExist(product.referencia);
+    console.log("existe?",checkProduct)
+    if(checkProduct === false){
+      var descriptionProducto = product.descripcionProducto.replace(/(\r\n|\n|\r)/gm, "").replace(/"/g, '\\"');
+      var collectionProduct = await productsHandler.getCollection(product.nombre);
+      var categoriaProduct = await getCategoriasHomologadas(categoriasID);
+      var categoriesFromSaelor = await productsHandler.getCategorieBySlug(categoriaProduct);
+      let newProduct = new Product({
+        name: productsHandler.cleanString(product.nombre),
+        description: "",
+        category: categoriesFromSaelor.id,
+        collection: [`${collectionProduct}`],
+        productType: "UHJvZHVjdFR5cGU6NA==",
+        currency: "CO",
+        raiting: 3,
+        price:product.precio1,
+        channelId: channelPromos,
+        mediaUrl: IMAGE_BASE_URL + product.imageUrl,
+        reference: product.referencia,
+        sku: product.referencia,
+        attributes: [],
+        variants: [],
+        metadata: [
+          { key: "urlImageJPG", value: IMAGE_BASE_URL + product.imageUrl },
+          { key: "referencia", value: product.referencia },
+          { key: "precioSugerido", value: product.precio1 },
+          { key: "descripcion", value: descriptionProducto },
+          { key: "categoria", value: categoriesFromSaelor.name },
+          { key: "distribuidor", value: "promos" }
+        ]
+      });
+      var productsVariants = await Promo.getProductsVariantsByProduct(product.referencia);
+        newProduct.variants = productsVariants["resultado"].map((e) => {
+            return {
+              sku: `${e.referencia}-promos-${e.id}`,
+              name: product.nombre + "-" + e.color,
+              price: product.precio1,
+              currency: "CO",
+              stocks: [
+                {
+                  quantity: e.bodegaZonaFranca ? e.bodegaZonaFranca : 0,
+                  warehouse: stockSettings[0].id
+                }, {
+                  quantity: e.cantidadTransito ? e.cantidadTransito : 0,
+                  warehouse: stockSettings[1].id
+                },
+                {
+                  quantity: e.bodegaLocal ? e.bodegaLocal : 0,
+                  warehouse: stockSettings[2].id
+                }
+              ],
+              attributes:[{
+                id:"QXR0cmlidXRlOjI=",
+                plainText:`${e.color}`
+              }],
+              metadata: [
+                { key: "urlImageJPG", value: IMAGE_BASE_URL + e.imageUrl },
+                { key: "referencia", value: product.referencia },
+                { key: "precioSugerido", value: e.precio1 },
+                { key: "categoria", value: categoriesFromSaelor.name },
+                { key: "distribuidor", value: "promos" },
+                e.color ? { key: "color", value: e.color } : {},
+                {key:"estadoOrden",value:e.estadoOrden},
+                {key:"stockTotal",value:e.totalDisponible},
+              ]
+            }
           })
-        }
-      })
+          console.log("product", newProduct)
+      await limiter.schedule(() => productsHandler.createProduct(newProduct));
     }
   }
-  return categoriesSort;
+}catch(e){
+  return {err:e}
 }
-export default { getAllIdsCategories };
+}
 
+async function loadProductsVariants(product,newProduct,categoria){
+  var productsVariants = await Promo.getProductsVariantsByProduct(product.referencia);
+  newProduct.variants = await productsVariants["resultado"].map(async(e) => {
+      let checkProductVariant = await productsHandler.productVariantExist(`${e.referencia}-promos-${e.id}`)
+      if(checkProductVariant === false){
+      return {
+        sku: `${e.referencia}-promos-${e.id}`,
+        name: product.nombre + "-" + e.color,
+        price: product.precio1,
+        currency: "CO",
+        stocks: [
+          {
+            quantity: e.bodegaZonaFranca ? e.bodegaZonaFranca : 0,
+            warehouse: stockSettings[0].id
+          }, {
+            quantity: e.cantidadTransito ? e.cantidadTransito : 0,
+            warehouse: stockSettings[1].id
+          },
+          {
+            quantity: e.bodegaLocal ? e.bodegaLocal : 0,
+            warehouse: stockSettings[2].id
+          }
+        ],
+        attributes:[{
+          id:"QXR0cmlidXRlOjI=",
+          plainText:`${e.color}`
+        }],
+        metadata: [
+          { key: "urlImageJPG", value: IMAGE_BASE_URL + e.imageUrl },
+          { key: "referencia", value: product.referencia },
+          { key: "precioSugerido", value: e.precio1 },
+          { key: "categoria", value: categoria.name },
+          { key: "distribuidor", value: "promos" },
+          e.color ? { key: "color", value: e.color } : {},
+          {key:"estadoOrden",value:e.estadoOrden},
+          {key:"stockTotal",value:e.totalDisponible},
+        ]
+      }}
+    })
+    return newProduct;
+}
+export default {loadCatalogoProductsPromos };
 
-//   let data = {
-//     name: "test desde backend",
-//     description: JSON.stringify("test desde admin ave backend"),
-//     category: "Q2F0ZWdvcnk6Mg==",
-//     collection:["Q29sbGVjdGlvbjoz"],
-//     productType: "UHJvZHVjdFR5cGU6NA==",
-//     raiting: 3,
-//     channelId:"Q2hhbm5lbDoz",
-//     variants:[{
-//       sku:"test dinamico sku",
-//       price: 10,
-//       currency: "CO",
-//       name: "test dinamico",
-//       stocks:[{
-//         quantity: 10,
-//         warehouse:"V2FyZWhvdXNlOmIwZGNlZjQzLTZkZmYtNGUyMi04Mzg2LTc5MTQ4MDExMzI3OQ=="
-//       }],
-//       attributes:[{
-//         id:"QXR0cmlidXRlOjI=",
-//         plainText:"rojo"
-//       }]
-//     }]
-//   }
-//   const productCreated = await product.createProduct(data);
-//   res.send({ productCreated });
-// });

@@ -9,7 +9,7 @@ router.use(function timeLog(req, res, next) {
 );
 
 router.get('/', async (req, res) => {
-  const promos = await promoController.getAllIdsCategories();
+  const promos = await promoController.loadCatalogoProductsPromos();
   res.json(promos);
 })
 

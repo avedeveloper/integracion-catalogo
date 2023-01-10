@@ -1,6 +1,6 @@
 import SaleorService from "../services/saleor/index.js";
 import Product from "../model/Product.js";
-const saelor = new SaleorService();
+
 async function createProduct(data){
 try{
   const product = new Product(data);

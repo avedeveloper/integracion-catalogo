@@ -1,5 +1,5 @@
 import Promo from '../services/api/promocionales/index.js'
-import Product from '../model/product.js'
+import Product from '../model/Product.js'
 import productsHandler from './products.js'
 import diccionarioPromos from '../services/api/promocionales/promosHomologation.js'
 import Bottleneck from "bottleneck";

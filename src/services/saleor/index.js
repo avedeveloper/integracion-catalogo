@@ -106,7 +106,7 @@ export default class SaleorService {
       }
     }
     `;
-    console.log(query)
+
     const response = await this.client.link.post('', { query });
     const { data } = response;
     return data;
@@ -171,7 +171,7 @@ export default class SaleorService {
       }
     }
     `;
-    console.log(query)
+  
     const response = await this.client.link.post('', { query });
     const { data } = response;
     return data;
@@ -389,7 +389,7 @@ export default class SaleorService {
 }
     `;
     try {
-      console.log(query)
+      // console.log(query)
       const response = await this.client.link.post('', { query });
       const { data } = response;
       return data;
@@ -683,6 +683,39 @@ export default class SaleorService {
     const response = await this.client.link.post('', { query });
     const { data } = response;
     return data;
+  }
+  async getProductByReference(ref){
+    const query=`
+    {
+      products(first:10 filter:{metadata:{key:"referencia" value: "${ref}"}}){
+        edges{
+          node{
+            id
+            name
+            metadata{
+              key
+              value
+            }
+          }
+        }
+      }
+    }
+    `
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data
+  }
+  async getProductVariantBySKU(sku){
+    const query = `
+    {
+      productVariant(sku:"${sku}"){
+        id
+        name
+      }
+    }`
+    const response = await this.client.link.post('', { query });
+    const { data } = response;
+    return data
   }
 }
 

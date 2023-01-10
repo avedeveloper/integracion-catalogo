@@ -1,12 +1,13 @@
 import SaleorService from "../services/saleor/index.js";
 import Product from "../model/Product.js";
+const saelor = new SaleorService();
 async function createProduct(data){
 try{
   const product = new Product(data);
   const saleor = new SaleorService();
   await saleor.getToken();
   const productCreated = await saleor.setProduct(product);
-  if(productCreated.data.productCreate.errors[0] !== undefined)return productCreated.data.productCreate.errors[0];
+  if(productCreated.data.productCreate.errors[0] !== undefined || productCreated.data.productCreate === undefined)return {errors:productCreated.data.productCreate.errors[0]};
   product.id = productCreated.data.productCreate.product.id
   await saleor.createMediaProduct(product);
   await saleor.setProductChannelListing(product);
@@ -15,7 +16,6 @@ try{
       return await createVariantProduct(saleor,product,variant);
     })
   }
-  console.log(product.variants.length)
   return {msg:"product created"};
 }catch(e){
   console.log(e)
@@ -25,7 +25,7 @@ try{
 async function createVariantProduct(saleor,product, variant){
   try{
     const productVariant = await saleor.setVariantProduct(variant,product.id);
-    if(productVariant.data.productVariantCreate.errors[0] !== undefined)return productVariant.data.productVariantCreate.errors[0];
+    if( productVariant.data.productVariantCreate === undefined ||productVariant.data.productVariantCreate.errors !== undefined)return {errors:productVariant.data.productVariantCreate.errors};
     variant.id = productVariant.data.productVariantCreate.productVariant.id;
     await saleor.setProductVariantChannelListing(variant,product.channelId);
   }catch(errors){
@@ -85,7 +85,7 @@ async function getCollection(data){
     await saleor.getToken();
     data = data.toLowerCase();
     if(data.includes("oferta")){
-      data = data.replace("oferta","")
+      data = "oferta"
     }else if(data.includes("produccion nacional"))
     {
       data = "produccion-nacional"
@@ -105,6 +105,7 @@ async function getCollection(data){
 }
 function cleanString(str){
   str = str.toLowerCase();
+  str = str.replace(/\"/g," ");
   if(str.includes("oferta")){
     str = str.replace("oferta","")}
   if (str.includes("produccion nacional")){
@@ -121,4 +122,16 @@ async function getCategorieBySlug(slug){
   const category = await saleor.getCategorieBySlug(slug);
   return {id:category.data.category.id,name:category.data.category.name};
 }
-export default { createProduct,getProducts,getProduct,updateProduct,getCollection,cleanString,getCategorieBySlug};
+async function productExist(ref){
+  const saelor = new SaleorService();
+  await saelor.getToken();
+  const product = await saelor.getProductByReference(ref)
+  return product.data.products.edges.length > 0;
+}
+async function productVariantExist(sku){
+  const saelor = new SaleorService();
+  await saelor.getToken();
+  const product = await saelor.getProductVariantBySKU(sku)
+  return product.data.productVariant !== null;
+}
+export default { createProduct,getProducts,getProduct,updateProduct,getCollection,cleanString,getCategorieBySlug,productExist,productVariantExist};

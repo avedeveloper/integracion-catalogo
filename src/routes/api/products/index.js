@@ -17,38 +17,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// router.post("/create", async (req, res,next) => {
-//   // const {body} = req;
-//   // const {product} = body;
-//   // if(!product){
-//   //   next("product is required");
-//   // }
-//   let data = {
-//     name: "test desde backend",
-//     description: JSON.stringify("test desde admin ave backend"),
-//     category: "Q2F0ZWdvcnk6Mg==",
-//     collection:["Q29sbGVjdGlvbjoz"],
-//     productType: "UHJvZHVjdFR5cGU6NA==",
-//     raiting: 3,
-//     channelId:"Q2hhbm5lbDoz",
-//     variants:[{
-//       sku:"test dinamico sku",
-//       price: 10,
-//       currency: "CO",
-//       name: "test dinamico",
-//       stocks:[{
-//         quantity: 10,
-//         warehouse:"V2FyZWhvdXNlOmIwZGNlZjQzLTZkZmYtNGUyMi04Mzg2LTc5MTQ4MDExMzI3OQ=="
-//       }],
-//       attributes:[{
-//         id:"QXR0cmlidXRlOjI=",
-//         plainText:"rojo"
-//       }]
-//     }]
-//   }
-//   const productCreated = await product.createProduct(data);
-//   res.send({ productCreated });
-// });
+router.post("/create", async (req, res,next) => {
+  const {body} = req;
+  const {product} = body;
+  if(!product){
+    next("product is required");
+  }
+  const productCreated = await product.createProduct(product);
+  res.send({ productCreated });
+});
 
 router.post('/product', async (req, res, next) => {
   const { body } = req;

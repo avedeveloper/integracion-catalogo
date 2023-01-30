@@ -1,0 +1,42 @@
+version: '3'
+services:
+  admin:
+    build: ./admin
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NATS_PORT=4222
+      - NATS_URL = nats://nats:4222
+    links:
+      - nats
+  login:
+    build: ./login
+    ports:
+      - "3002:3002"
+    environment:
+      - db_mongo_uri=mongodb+srv://castanolagustin:<password>@cluster0.lpr1s.mongodb.net/?retryWrites=true&w=majority
+      - db_mongo_user=castanolagustin
+      - db_mongo_pass=DEDXU57JyhCxLXqz
+      - SECRET=not_so_secret
+      - NATS_URL = nats://nats:4222
+  aph:
+    build: ./aph
+    ports:
+      - "3003:3003"
+    environment:
+      - db_postgres_db=products
+      - db_postgres_user=postgres
+      - db_postgres_pass=postgrespw
+      - db_postgres_host=pgAph
+      - db_postgres_port=5432
+      - NATS_URL = nats://nats:4222
+    links:
+      - nats
+  nats:
+    image: nats-streaming
+    ports:
+      - "4222:4222"
+    volumes:
+      - ./nats.conf:/nats.conf
+    command: ["-c", "/nats.conf"]

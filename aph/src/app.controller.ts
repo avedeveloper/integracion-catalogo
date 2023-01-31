@@ -26,6 +26,11 @@ export class AppController {
     return res;
 
   }
+  @EventPattern('get_stocks')
+  async handleGetStock(data: any) {
+    const res = await this.aphService.getStocks(data);
+    return res;
+  }
   @EventPattern('get_product')
   async handleGetProduct(data: any) {
     const res = await this.aphService.getProduct(data);
@@ -59,6 +64,11 @@ export class AppController {
   @EventPattern('set_category')
   async handleSetCategory(data: any) {
     const res = await this.aphService.setCategory(data);
+    return res;
+  }
+  @EventPattern('get_category')
+  async handleGetCategory(data: any) {
+    const res = await this.aphService.getCategory(data);
     return res;
   }
   @EventPattern('load')

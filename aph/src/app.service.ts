@@ -12,24 +12,25 @@ export class AppService {
       const limit = data.limit || 10;
       const offset = data.offset || 0;
       //OFFSET ${offset} LIMIT ${limit}
-      // const res = await this.sequelize.query(`SELECT * FROM "public"."products" 
-      // join "public"."variants" on "public"."products"."idProducts" = "public"."variants"."product_id" 
-      // join "public"."stock" on "public"."variants"."id_variant" = "public"."stock"."variant_id" 
-      // join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
-      // join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
-      // join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id"
-      // OFFSET ${offset} LIMIT ${limit}`);
-      const res =<any> await this.sequelize.query(`SELECT * FROM "public"."products" OFFSET ${offset} LIMIT ${limit}`);
-      return res[0];
+      const res = await this.sequelize.query(`SELECT * FROM "public"."products" 
+      join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
+      join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
+      join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id"
+      OFFSET ${offset} LIMIT ${limit}`);
+      const count = <any>await this.sequelize.query(`SELECT COUNT(*) FROM "public"."products"`);
+      return { data: res[0], totalRows: count[0][0].count };
         } catch (err) {
       console.log('err', err);
       return err;
     }
   }
-  async getCategory(category:any){
+  async getCategory(data:any){
     try{
-      const res = await this.sequelize.query(`SELECT * FROM "public"."categories" WHERE "id_categorias" = '${category}'`);
-      return res[0];
+      if(data.category){
+        return {message:'Empty category'}
+      }
+      const res = await this.sequelize.query(`SELECT * FROM "public"."categories" WHERE "id_categorias" = '${data.category}'`);
+      return {data: res[0]};
     } catch(err){
       console.log(err)
       return err;
@@ -96,15 +97,14 @@ export class AppService {
           message: 'missing id_productos',
         };
       }
-      return await this.sequelize.query(`
+      const product= await this.sequelize.query(`
       SELECT * FROM public.products
-      join "public"."variants" on "public"."products"."idProducts" = "public"."variants"."product_id" 
-      join "public"."stock" on "public"."variants"."id_variant" = "public"."stock"."variant_id" 
       join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
       join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
       join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id"
-      WHERE idProducts = '${data.id_productos}'
+      WHERE "public"."products"."idProducts" = '${data.id_productos}'
       `);
+      return {data:product[0][0]};
     } catch (err) {
       console.log(err);
       return err;
@@ -118,24 +118,29 @@ export class AppService {
           message: 'missing search',
         };
       }
-      return await this.sequelize.query(`
+      const product = await this.sequelize.query(`
       SELECT * FROM public.products
-      join "public"."variants" on "public"."products"."idProducts" = "public"."variants"."product_id" 
-      join "public"."stock" on "public"."variants"."id_variant" = "public"."stock"."variant_id" 
-      join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
-      join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
-      join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id" 
       WHERE name_product LIKE '%${data.search}%'`);
+      return product[0];
     } catch (err) {
       console.log(err);
       return err;
     }
   }
   async getVariants(data: any) {
-    const res = await this.sequelize.query(
-      `SELECT * FROM "public"."variants where product_id = ${data}"`,
-    );
-    return res;
+try{
+  if(data.idProducts == undefined || data.idProducts == null){
+    return {message: 'missing idProducts'}
+  }
+  const res = await this.sequelize.query(
+    `SELECT * FROM "public"."variants" 
+    where product_id = '${data.idProducts}'`,
+  );
+  return res;
+} catch(err){
+  console.log(err)
+  return err;
+}
   }
   
   async setVariant(data: any) {
@@ -150,7 +155,7 @@ export class AppService {
         id_variant: uuidv1(),
         name_variant: data.name_variants,
         metadata_variant: JSON.stringify(data.metadata_variants),
-        description_variant: data.description_variant+'demo',
+        description_variant: data.description_variant?data.description_variant:"  ",
         brand: data.brand,
         price_override: data.price_override,
         weight_override: data.weight_override,
@@ -177,8 +182,11 @@ INSERT INTO public.variants(
           message: 'missing id_variant',
         }
       }
-      return await this.sequelize.query(`
-      SELECT * FROM public.stocks WHERE variantId = ${data.variantId}`);
+      const res = await this.sequelize.query(`
+      SELECT * FROM public.stock 
+      join "public"."stockLocation" on "public"."stockLocation"."idStockLocation" = "public"."stock"."locationId"
+      WHERE variant_id = '${data.id_variant}'`);
+      return res[0];
     } catch (err) {
       console.log(err);
       return err;
@@ -186,8 +194,9 @@ INSERT INTO public.variants(
   }
   async getProveedores(data:any){
     try {
-      return await this.sequelize.query(`
+      const res = await this.sequelize.query(`
       SELECT * FROM public."supplier"`);
+      return {data : res[0]};
     } catch (err) {
       console.log(err)
       return err;
@@ -307,7 +316,7 @@ INSERT INTO public.variants(
     const res = await this.sequelize.query(
       `SELECT * FROM "public"."categories"`,
     );
-    return res;
+    return {data: res[0]};
   }
   async getCategoryBySlug(data: any) {
    try{

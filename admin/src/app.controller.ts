@@ -16,52 +16,43 @@ export class AppController {
   // eslint-disable-next-line @typescript-eslint/ban-types
   async home(@Body() body: any): Promise<Object> {
     const res = await this.appService.home(body);
-    return { data: res };
+    return res;
   }
   @Post('/get_products')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getProducts(@Body() body: any): Promise<Object> {
     const res = await this.appService.getProducts(body);
-    return { data: res };
+    return res;
   }
-  @Post('/get_products/:id')
+  @Post('/get_products/search')
   // eslint-disable-next-line @typescript-eslint/ban-types
-  async getProductsSearch(
-    @Body() body: any,
-    @Query() query: any,
-  ): Promise<any> {
-    const res = await this.appService.searchProduct(body, query);
-    return { data: res };
+  async getProductsSearch(@Body() body: any): Promise<any> {
+    const res = await this.appService.searchProduct(body);
+    return res ;
   }
   @Post('/get_product')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getProduct(@Body() body: any): Promise<Object> {
     const res = await this.appService.getProduct(body);
-    return { data: res };
+    return res;
   }
-  @Post('/getVariants')
+  @Post('/get_variants')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getVariants(@Body() body: any): Promise<Object> {
     const res = await this.appService.getVariants(body);
-    return { data: res };
+    return res;
   }
   @Post('/get_proveedores')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getProveedores(@Body() body: any): Promise<Object> {
     const res = await this.appService.getProveedores(body);
-    return { data: res };
-  }
-  @Post('/get_proveedor')
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  async getProveedor(@Body() body: any): Promise<Object> {
-    const res = await this.appService.getProveedor(body);
-    return { data: res };
+    return res ;
   }
   @Post('/get_categories')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getCategories(@Body() body: any): Promise<Object> {
     const res = await this.appService.getCategories(body);
-    return { data: res };
+    return res ;
   }
   @Post('/set_category')
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -69,29 +60,29 @@ export class AppController {
     const res = await this.appService.setCategory(body);
     return { data: res };
   }
-  // @Post('/load')
-  // // eslint-disable-next-line @typescript-eslint/ban-types
-  // async loadCategories(): Promise<Object> {
-  //   const res = await this.appService.loadCategories();
-  //   return { data: res };
-  // }
+  @Post('/get_category')
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  async getCategory(@Body() body: any): Promise<Object> {
+    const res = await this.appService.getCategory(body);
+    return res ;
+  }
   @Post('/delete_category')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async deleteCategory(@Body() body: any): Promise<Object> {
     const res = await this.appService.deleteCategory(body);
-    return { data: res };
+    return res;
   }
   @Post('/get_users')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getUsers(@Body() body: any): Promise<Object> {
     const res = await this.appService.getUsers(body);
-    return { data: res };
+    return  res;
   }
   @Post('/get_user')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getUser(@Body() body: any): Promise<Object> {
     const res = await this.appService.getUser(body);
-    return { data: res };
+    return res;
   }
   @Post('/edit_user')
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -103,6 +94,12 @@ export class AppController {
   // eslint-disable-next-line @typescript-eslint/ban-types
   async getLogs(@Body() body: any): Promise<Object> {
     const res = await this.appService.getLogs(body);
-    return { data: res };
+    return res;
   }
+  @Post('/getStocks')
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    async getStocks(@Body() body: any): Promise<Object> {
+      const res = await this.appService.getStocks(body);
+      return res;
+    }
 }

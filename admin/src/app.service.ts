@@ -21,9 +21,9 @@ export class AppService {
       .toPromise();
     return res;
   }
-  async searchProduct(product: any, query: any) {
+  async searchProduct(product: any) {
     const res = await this.clienteLogin
-      .send('search_product', { product, query })
+      .send('search_product', product)
       .toPromise();
     return res;
   }
@@ -52,6 +52,10 @@ export class AppService {
     const res = await this.clienteLogin
       .send('set_category', category)
       .toPromise();
+    return res;
+  }
+  async getCategory(body: any) {
+    const res = await this.clienteLogin.send('get_category', body).toPromise();
     return res;
   }
 
@@ -90,97 +94,105 @@ export class AppService {
     return res;
   }
   async getUsers(user: any) {
-    const res = [
-      {
-        user: 'test 1',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
+    const res = {
+      data: [
+        {
+          user: 'test 1',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'activo',
+            tipoDeCuenta: 'demo',
+          },
         },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'activo',
-          tipoDeCuenta: 'demo',
+        {
+          user: 'test 2',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'lead',
+            tipoDeCuenta: 'premiun',
+          },
         },
-      },
-      {
-        user: 'test 2',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
+        {
+          user: 'test 4',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'lead',
+            tipoDeCuenta: 'demo',
+          },
         },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'lead',
-          tipoDeCuenta: 'premiun',
+        {
+          user: 'test 3',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'desactivado',
+            tipoDeCuenta: 'premium',
+          },
         },
-      },
-      {
-        user: 'test 4',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
+        {
+          user: 'test 5',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'activo',
+            tipoDeCuenta: 'gratuita',
+          },
         },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'lead',
-          tipoDeCuenta: 'demo',
-        },
-      },
-      {
-        user: 'test 3',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
-        },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'desactivado',
-          tipoDeCuenta: 'premium',
-        },
-      },
-      {
-        user: 'test 5',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
-        },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'activo',
-          tipoDeCuenta: 'gratuita',
-        },
-      },
-    ];
+      ],
+    };
     return res;
   }
   async getUser(user: any) {
-    const res = [
-      {
-        user: 'test 5',
-        img: {
-          src: 'https://www.w3schools.com/howto/img_avatar.png',
-          alt: 'Avatar',
+    const res = {
+      data: [
+        {
+          user: 'test 5',
+          img: {
+            src: 'https://www.w3schools.com/howto/img_avatar.png',
+            alt: 'Avatar',
+          },
+          text: 'text de prueba',
+          description: 'test de descripcion',
+          date: '2021-04-18 14:28:01',
+          status: {
+            pago: 'activo',
+            tipoDeCuenta: 'gratuita',
+          },
         },
-        text: 'text de prueba',
-        description: 'test de descripcion',
-        date: '2021-04-18 14:28:01',
-        status: {
-          pago: 'activo',
-          tipoDeCuenta: 'gratuita',
-        },
-      },
-    ];
+      ],
+    };
+    return res;
+  }
+  async getStocks(data: any) {
+    const res = await this.clienteLogin.send('get_stocks', data).toPromise();
     return res;
   }
 }

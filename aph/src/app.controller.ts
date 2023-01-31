@@ -24,6 +24,7 @@ export class AppController {
   async handleGetProducts(data: any) {
     const res = await this.aphService.getProducts(data);
     return res;
+
   }
   @EventPattern('get_product')
   async handleGetProduct(data: any) {

@@ -28,8 +28,8 @@ services:
       - db_postgres_db=products
       - db_postgres_user=postgres
       - db_postgres_pass=postgrespw
-      - db_postgres_host=pgAph
-      - db_postgres_port=5432
+      - db_postgres_host=localhost
+      - db_postgres_port=32768
       - NATS_URL = nats://nats:4222
     links:
       - nats

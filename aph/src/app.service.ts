@@ -12,16 +12,26 @@ export class AppService {
       const limit = data.limit || 10;
       const offset = data.offset || 0;
       //OFFSET ${offset} LIMIT ${limit}
-      const res = await this.sequelize.query(`SELECT * FROM "public"."products" 
-      join "public"."variants" on "public"."products"."idProducts" = "public"."variants"."product_id" 
-      join "public"."stock" on "public"."variants"."id_variant" = "public"."stock"."variant_id" 
-      join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
-      join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
-      join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id"
-      OFFSET ${offset} LIMIT ${limit}`);
-      return res;
-    } catch (err) {
+      // const res = await this.sequelize.query(`SELECT * FROM "public"."products" 
+      // join "public"."variants" on "public"."products"."idProducts" = "public"."variants"."product_id" 
+      // join "public"."stock" on "public"."variants"."id_variant" = "public"."stock"."variant_id" 
+      // join "public"."collection" on "public"."products"."collection_id" = "public"."collection"."idCollection" 
+      // join "public"."categories" on "public"."products"."category_id" = "public"."categories"."id_categorias" 
+      // join "public"."supplier" on "public"."products"."supplier" = "public"."supplier"."id"
+      // OFFSET ${offset} LIMIT ${limit}`);
+      const res =<any> await this.sequelize.query(`SELECT * FROM "public"."products" OFFSET ${offset} LIMIT ${limit}`);
+      return res[0];
+        } catch (err) {
       console.log('err', err);
+      return err;
+    }
+  }
+  async getCategory(category:any){
+    try{
+      const res = await this.sequelize.query(`SELECT * FROM "public"."categories" WHERE "id_categorias" = '${category}'`);
+      return res[0];
+    } catch(err){
+      console.log(err)
       return err;
     }
   }
@@ -123,7 +133,7 @@ export class AppService {
   }
   async getVariants(data: any) {
     const res = await this.sequelize.query(
-      `SELECT * FROM "public"."variants where product_id = ${data.product_id}"`,
+      `SELECT * FROM "public"."variants where product_id = ${data}"`,
     );
     return res;
   }
